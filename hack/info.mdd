@@ -1,0 +1,107 @@
+
+Plug-And-Play Dynamic Website - Automated, dynamic website 
+based on third party user data 
+VC Track
+
+1. Goals / Motivation
+Most websites (especially SMB + Shopify stores) run the same homepage and landing pages for every visitor — even though visitors arrive with different intents.
+Examples:
+“I want to buy a 4K gaming monitor now”
+“I’m researching best monitors for work”
+“I’m comparing brands/prices”
+Big enterprises solve this with expensive personalization tools and analytics teams. SMBs can’t.
+Goal: Build a plug-and-play personalization layer that any website can install in minutes, and that uses AI to pick the right template variant + images + messages per visitor intent.
+Goal
+Create an AI-first widget / snippet that:
+Works on any website (Shopify, Webflow, custom sites)
+Requires minimal setup
+Detects user intent from context signals
+Selects from a finite set of templates + assets
+Swaps hero image, headline, CTA, and optionally section order
+Provides a “why this variant” explanation for debugging and trust
+This is not “generate a new website”.
+This is safe, templatized personalization.
+Pick one domain to demo, but make the mechanism generic.
+Recommended demo domain: E-commerce (Monitors store)
+Visitors arrive with intents like:
+Buy Now (“buy 27 inch 4k monitor”)
+Compare (“best monitor 2026 comparison”)
+Use Case (“monitor for gaming / coding / design”)
+Budget (“cheap 144hz monitor”)
+Your system should show clearly different hero experiences per intent.
+2. Features
+2.1 Plug-and-Play Install (must feel Shopify-ready)
+Provide one of:
+A single script tag that can be pasted into any site
+A “mock Shopify app” install flow (simulated) that injects the script
+A simple “copy this snippet” embed
+Must work on a static demo page with no backend required
+Setup should be < 5 minutes
+2.2 Templatized Variants (finite inventory)
+Define a Template Registry with at least:
+3 hero templates (same layout, different content slots)
+Each template has slots:
+hero image
+headline
+subheadline
+CTA label + link target
+Example template:
+HeroTemplateA(image, headline, subheadline, cta_text, cta_link)
+2.3 Asset Library (pictures are mandatory)
+Create an asset library with at least:
+6 images (e.g., gaming setup, office desk, design studio, price-focused graphic, etc.)
+Optional: 3 icon sets / badges (“Free Shipping”, “Warranty”, “Best Seller”)
+AI must choose images based on intent, not randomly.
+2.4 Intent Detection (2+ signals)
+Infer intent from at least two of:
+URL query / UTM parameters
+referrer type (Google vs social vs email)
+on-page behavior (scroll/click in first 5 seconds) — simulated ok
+a “persona” toggle for demo
+2.5 Decision Engine (must be explainable)
+AI must decide at minimum:
+which hero template to use
+which hero image to show
+which CTA to prioritize (Buy / Compare / Explore)
+✅ Must output a structured decision object like:
+{
+  "intent": "COMPARE",
+  "template": "Hero_B",
+  "hero_image": "img_gaming_vs_office.jpg",
+  "cta": "Compare models",
+  "reason": "Query contains 'best' + 'vs' signals comparison intent."
+
+2.6 Personalization Injection (front-end)
+On page load, your script:
+determines context
+queries decision engine (local rules or API)
+swaps assets/text in DOM safely
+logs what happened (for demo)
+
+Constraints (Very Important)
+No chatbot as the main UX
+No full page generation end-to-end
+Must use finite templates + finite assets
+Must be installable via snippet
+Must be safe: fallback to default content
+
+3. Optional Extensions (Stretch Goals)
+Teams are encouraged (but not required) to explore advanced features such as:
+Lightweight event tracking (clicks on CTA, add-to-cart, “compare” clicks)
+A/B exploration mode (try 2 variants, pick winner)
+Multi-page support (homepage + product page hero)
+“Preview mode” for site owners: simulate intents and see variants
+4. Hints and Resources
+Frontend: simple HTML/React + DOM mutation
+“Install”: script injection pattern
+Decision engine can be:
+rules + LLM (best)
+pure rules (acceptable for MVP)
+Store template registry as JSON
+5. Why Does It Matter?
+This is the smallest wedge into a massive market:
+personalization for the long tail (Shopify/SMBs), not just enterprises.
+If plug-and-play personalization becomes easy and safe, it becomes:
+a default growth lever for every small business
+an “AI Stripe for website experiences”
+

@@ -6,3 +6,6 @@ node_modules
 
 build/es6
 build/es5
+
+
+.env

@@ -147,8 +147,159 @@ localStorage.removeItem('ab-tests');
 location.reload();
 ```
 
-## 6. Best Practices
+## 6. UTM-Based Personalization
+
+Lua includes built-in UTM parameter detection and content personalization. This allows you to show different content based on where users come from (Google Ads, Facebook, email campaigns, etc.).
+
+### Basic UTM Personalization
+
+```html
+<!-- Include the UTM personalization script -->
+<script src="utm-personalize.js" defer></script>
+```
+
+```javascript
+// Define your content templates
+var templates = {
+    'gaming': {
+        headline: 'Level Up Your Setup',
+        subheadline: 'Pro-grade gear for serious gamers.',
+        ctaLabel: 'Explore Gaming',
+        ctaLink: '/gaming',
+        image: '/images/gaming-hero.jpg'
+    },
+    'professional': {
+        headline: 'Work Smarter',
+        subheadline: 'Premium productivity tools.',
+        ctaLabel: 'View Collection',
+        ctaLink: '/professional',
+        image: '/images/pro-hero.jpg'
+    },
+    'default': {
+        headline: 'Welcome',
+        subheadline: 'Discover products you will love.',
+        ctaLabel: 'Shop Now',
+        ctaLink: '/shop',
+        image: '/images/default-hero.jpg'
+    }
+};
+
+// Apply personalization
+LuaUTMPersonalize.personalize({
+    templates: templates,
+    log: true
+});
+```
+
+### HTML Markup
+
+Use `data-personalize` attributes to mark elements that should be personalized:
+
+```html
+<div class="hero" data-personalize="hero">
+    <h1 data-personalize="headline">Default Headline</h1>
+    <p data-personalize="subheadline">Default subheadline</p>
+    <a href="/shop" data-personalize="ctaLink">
+        <span data-personalize="ctaLabel">Default CTA</span>
+    </a>
+</div>
+```
+
+## 7. AI-Powered Personalization
+
+Enhance personalization with AI-driven content selection and generation using OpenAI models.
+
+### Setup
+
+Include the AI modules after the core personalization script:
+
+```html
+<!-- Core personalization -->
+<script src="utm-personalize.js" defer></script>
+
+<!-- AI modules -->
+<script src="storage/weighted-history.js" defer></script>
+<script src="prompts/personalization-prompts.js" defer></script>
+<script src="ai-personalize.js" defer></script>
+```
+
+### Enable AI Personalization
+
+```javascript
+// Option 1: Direct OpenAI API (for development/testing)
+LuaUTMPersonalize.personalize({
+    templates: templates,
+    enableAI: true,
+    aiConfig: {
+        apiKey: 'sk-your-openai-key',
+        model: 'gpt-4o-mini',  // Default model
+        mode: 'select'          // 'select' or 'generate'
+    }
+}).then(function(decision) {
+    console.log('AI selected:', decision.intent);
+    console.log('Confidence:', decision.aiResponse.confidence);
+});
+
+// Option 2: Via backend proxy (recommended for production)
+LuaUTMPersonalize.personalize({
+    templates: templates,
+    enableAI: true,
+    aiConfig: {
+        apiUrl: 'https://your-server.com/api/openai-proxy',
+        mode: 'select'
+    }
+});
+```
+
+### AI Modes
+
+**Select Mode**: AI chooses the best variant from your predefined templates.
+- Predictable output
+- Brand-consistent content
+- Faster response
+
+**Generate Mode**: AI creates new personalized content from scratch.
+- Highly personalized
+- Unique content per user segment
+- Requires brand context configuration
+
+```javascript
+// Generate mode example
+aiConfig: {
+    apiKey: 'sk-...',
+    mode: 'generate',
+    brandContext: {
+        brandVoice: 'bold, energetic, youthful',
+        targetAudience: 'gamers aged 18-30',
+        productType: 'gaming peripherals'
+    }
+}
+```
+
+### User History & Weighted Decay
+
+The AI system automatically tracks user visits and applies exponential decay to older visits. Recent behavior carries more weight than historical patterns.
+
+```javascript
+// Check if user is returning
+if (LuaWeightedHistory.isReturningUser()) {
+    var history = LuaWeightedHistory.getHistory();
+    console.log('Visit count:', history.visits.length);
+    console.log('Preferences:', history.preferences);
+}
+
+// Clear history (for testing)
+LuaWeightedHistory.clearHistory();
+LuaAIPersonalize.clearCache();
+```
+
+For comprehensive AI setup, see the [AI Personalization Guide](AI_PERSONALIZATION_GUIDE.md).
+
+## 8. Best Practices
 
 - **Unique Names**: Ensure every test has a unique `name`.
 - **Clean Up**: When a test is over, remove the definition and the logic, but keep the winning variant's code.
 - **Server-Side**: If using SSR, ensure the storage driver works with cookies or headers to maintain consistency between server and client.
+- **AI Security**: For production, use a backend proxy instead of exposing your OpenAI API key client-side.
+- **Caching**: AI decisions are cached by default (1 hour). Adjust `cacheDuration` in `aiConfig` if needed.
+- **Fallback**: AI automatically falls back to standard UTM-based personalization if the API fails.

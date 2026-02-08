@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua E-commerce Demo</title>
+    <title>Lua E-commerce Demo - UTM Personalization</title>
     <style>
         :root {
             --primary-color: #111;
@@ -50,9 +50,10 @@
             color: var(--primary-color);
         }
 
-        /* Hero Section (The Test Target) */
+        /* Hero Section (Personalization Target) */
         .hero {
             height: 80vh;
+            min-height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -61,7 +62,7 @@
             background-position: center;
             position: relative;
             color: white;
-            transition: all 0.5s ease;
+            transition: background-image 0.5s ease;
         }
 
         .hero::before {
@@ -71,8 +72,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            /* Overlay for readability */
+            background: rgba(0, 0, 0, 0.35);
         }
 
         .hero-content {
@@ -108,37 +108,6 @@
 
         .btn:hover {
             transform: translateY(-2px);
-        }
-
-        /* Custom Styles for Variants */
-        /* Seasonal: Bold, Warm */
-        .variant-seasonal .hero {
-            background-image: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1600&q=80');
-        }
-
-        .variant-seasonal .btn {
-            background-color: #ff4757;
-            color: white;
-        }
-
-        /* Minimal: Clean, High-end */
-        .variant-minimal .hero {
-            background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80');
-        }
-
-        .variant-minimal .hero h1 {
-            font-weight: 300;
-            letter-spacing: 2px;
-        }
-
-        /* Story: Lifestyle, Narrative */
-        .variant-story .hero {
-            background-image: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80');
-        }
-
-        .variant-story .hero::before {
-            background: rgba(0, 0, 0, 0.5);
-            /* Darker overlay */
         }
 
         /* Product Grid (Static) */
@@ -183,12 +152,54 @@
             bottom: 2rem;
             right: 2rem;
             background: white;
-            padding: 1rem;
+            padding: 1.25rem;
             border: 1px solid #ddd;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             z-index: 100;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            max-width: 340px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .debug-panel strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .debug-panel .debug-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .debug-panel .debug-label {
+            color: #888;
+            font-size: 0.75rem;
+        }
+
+        .debug-panel .debug-value {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #333;
+            text-align: right;
+            max-width: 180px;
+            word-break: break-all;
+        }
+
+        .debug-panel .debug-value.utm-source {
+            color: #2563eb;
+        }
+
+        .debug-panel .debug-value.referrer-source {
+            color: #059669;
+        }
+
+        .debug-panel .debug-value.random-source {
+            color: #d97706;
         }
 
         .debug-panel button {
@@ -196,12 +207,80 @@
             border: none;
             padding: 0.5rem 1rem;
             cursor: pointer;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
             border-radius: 4px;
+            font-size: 0.8rem;
+            width: 100%;
         }
 
         .debug-panel button:hover {
             background: #ddd;
+        }
+
+        .debug-panel .utm-links {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #eee;
+        }
+
+        .debug-panel .utm-links strong {
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .debug-panel .utm-links a {
+            display: block;
+            font-size: 0.7rem;
+            color: #2563eb;
+            text-decoration: none;
+            padding: 0.2rem 0;
+            word-break: break-all;
+        }
+
+        .debug-panel .utm-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            nav a {
+                margin-left: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+            }
+
+            .products {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                padding: 2rem 1rem;
+                gap: 1rem;
+            }
+
+            .product-img {
+                height: 180px;
+            }
+
+            .debug-panel {
+                bottom: 0.5rem;
+                right: 0.5rem;
+                left: 0.5rem;
+                max-width: none;
+            }
         }
     </style>
 </head>
@@ -218,13 +297,22 @@
         </nav>
     </header>
 
-    <!-- Hero Section: Content will be injected by Lua -->
-    <div id="hero-container" class="hero-wrapper">
-        <!-- Rendered by JS -->
+    <!--
+        Hero Section: Uses data-personalize attributes for content injection
+        The UTM personalization engine scans for these attributes and
+        injects content based on UTM params, referrer, or random A/B fallback
+    -->
+    <div class="hero" data-personalize="hero">
+        <div class="hero-content">
+            <h1 data-personalize="headline">Welcome to Our Store</h1>
+            <p data-personalize="subheadline">Discover products you'll love.</p>
+            <a href="/shop" data-personalize="ctaLink" class="btn">
+                <span data-personalize="ctaLabel">Start Shopping</span>
+            </a>
+        </div>
     </div>
 
     <section class="products">
-        <!-- Static placeholders -->
         <div class="product-card">
             <div class="product-img">Product Bundle 1</div>
             <div class="product-info">
@@ -255,89 +343,382 @@
         </div>
     </section>
 
-    <!-- Debug Panel -->
-    <div class="debug-panel">
-        <strong>Lua Debug</strong>
-        <div id="current-variant">Variant: Loading...</div>
-        <button onclick="resetTest()">Reset Assignment</button>
+    <!-- Debug Panel: Shows personalization context and allows testing UTM URLs -->
+    <div class="debug-panel" id="debug-panel">
+        <strong>Lua Personalization Debug</strong>
+        <div id="debug-info">Loading...</div>
+
+        <!-- AI Configuration Toggle -->
+        <div id="ai-config-section" style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #eee;">
+            <strong style="font-size:0.8rem;">AI Personalization</strong>
+            <div style="margin-top:0.4rem;">
+                <label style="font-size:0.7rem;display:flex;align-items:center;gap:0.3rem;cursor:pointer;">
+                    <input type="checkbox" id="ai-toggle"> Enable AI Mode
+                </label>
+            </div>
+            <div id="ai-fields" style="display:none;margin-top:0.4rem;">
+                <input type="text" id="ai-api-key" placeholder="OpenAI API Key (sk-...)"
+                    style="width:100%;padding:0.3rem;font-size:0.7rem;margin-bottom:0.3rem;border:1px solid #ddd;border-radius:3px;box-sizing:border-box;">
+                <select id="ai-model" style="width:100%;padding:0.3rem;font-size:0.7rem;margin-bottom:0.3rem;border:1px solid #ddd;border-radius:3px;">
+                    <option value="gpt-4o-mini" selected>gpt-4o-mini (default)</option>
+                    <option value="gpt-4o">gpt-4o</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo</option>
+                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                </select>
+                <select id="ai-mode" style="width:100%;padding:0.3rem;font-size:0.7rem;margin-bottom:0.3rem;border:1px solid #ddd;border-radius:3px;">
+                    <option value="select" selected>Select Mode (pick best variant)</option>
+                    <option value="generate">Generate Mode (AI writes content)</option>
+                </select>
+                <button onclick="runAIPersonalization()" style="width:100%;padding:0.4rem;font-size:0.75rem;background:#2563eb;color:white;border:none;border-radius:3px;cursor:pointer;margin-bottom:0.3rem;">
+                    Run AI Personalization
+                </button>
+                <div id="ai-status" style="font-size:0.65rem;color:#666;"></div>
+            </div>
+        </div>
+
+        <div class="utm-links">
+            <strong>Test UTM Links:</strong>
+            <a href="?utm_source=google&utm_medium=cpc&utm_campaign=summer_sale">Google Ads - Sale Campaign</a>
+            <a href="?utm_source=facebook&utm_medium=social&utm_campaign=gaming_promo">Facebook - Gaming</a>
+            <a href="?utm_source=twitter&utm_medium=social&utm_campaign=brand_story">Twitter - Brand Story</a>
+            <a href="?utm_source=email&utm_medium=newsletter&utm_campaign=welcome_back">Email - Returning User</a>
+            <a href="?utm_source=youtube&utm_medium=video&utm_campaign=creative_tools">YouTube - Creative</a>
+            <a href="?utm_source=instagram&utm_medium=social">Instagram - Social</a>
+            <a href="?utm_source=linkedin&utm_medium=professional&utm_campaign=office_gear">LinkedIn - Professional</a>
+            <a href="?">No UTM (Random A/B)</a>
+        </div>
+        <button onclick="resetAndReload()">Reset & Reload (No UTM)</button>
+        <button onclick="clearAIHistory()" style="margin-top:0.25rem;">Clear AI History & Cache</button>
     </div>
 
-    <script src="../build/lua.js"></script>
+    <!--
+        Load the standalone UTM Personalization script
+        Uses defer to avoid blocking page load (recommended approach)
+        This single script handles: UTM extraction, intent inference,
+        DOMPurify sanitization, and data-personalize attribute injection
+    -->
+    <script src="../src/utm-personalize.js" defer></script>
+
+    <!-- AI Personalization Modules (optional - load for AI features) -->
+    <script src="../src/storage/weighted-history.js" defer></script>
+    <script src="../src/prompts/personalization-prompts.js" defer></script>
+    <script src="../src/ai-personalize.js" defer></script>
+
     <script>
-        // 1. Template Registry / Content Data
-        const heroTemplates = {
-            'seasonal': {
-                headline: 'Summer Sale is Here',
-                subheadline: 'Up to 50% off select styles. Limited time only.',
-                ctaLabel: 'Shop the Sale',
-                className: 'variant-seasonal'
+        // ===================================================================
+        // USER-PROVIDED TEMPLATES
+        // Users define their own templates with their own content/assets
+        // ===================================================================
+        var userTemplates = {
+            // Price-focused: Sales and promotions
+            'price-focused': {
+                image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Exclusive Deals Just For You',
+                subheadline: 'Save up to 50% on premium products. Limited time offer.',
+                ctaLabel: 'Shop Deals Now',
+                ctaLink: '/deals'
             },
-            'minimal': {
-                headline: 'The New Essentials',
-                subheadline: 'Timeless pieces for the modern wardrobe.',
+            // Gaming enthusiasts
+            'gaming': {
+                image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Level Up Your Setup',
+                subheadline: 'Pro-grade gear for serious gamers. RGB everything.',
+                ctaLabel: 'Explore Gaming',
+                ctaLink: '/gaming'
+            },
+            // Professional/office users
+            'professional': {
+                image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Work Smarter, Not Harder',
+                subheadline: 'Premium productivity tools for professionals.',
                 ctaLabel: 'View Collection',
-                className: 'variant-minimal'
+                ctaLink: '/professional'
             },
-            'story': {
-                headline: 'Crafted with Care',
-                subheadline: 'Sustainable materials, ethically sourced.',
+            // Creative/design focused
+            'creative': {
+                image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Create Without Limits',
+                subheadline: 'Tools and gear designed for creatives and artists.',
+                ctaLabel: 'Get Inspired',
+                ctaLink: '/creative'
+            },
+            // Brand story/about
+            'brand-story': {
+                image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Crafted With Purpose',
+                subheadline: 'Ethically sourced. Sustainably made. Built to last.',
                 ctaLabel: 'Our Story',
-                className: 'variant-story'
+                ctaLink: '/about'
+            },
+            // Search engine visitors
+            'search-optimized': {
+                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Find What You Need',
+                subheadline: 'Top-rated products trusted by thousands.',
+                ctaLabel: 'Browse All',
+                ctaLink: '/products'
+            },
+            // Social media visitors (visual focus)
+            'social-visual': {
+                image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80',
+                headline: "What's Trending Now",
+                subheadline: 'The styles everyone is talking about.',
+                ctaLabel: 'See Trending',
+                ctaLink: '/trending'
+            },
+            // Twitter/X visitors (brief messaging)
+            'social-brief': {
+                image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Discover. Shop. Enjoy.',
+                subheadline: 'Curated picks, delivered fast.',
+                ctaLabel: 'Quick Shop',
+                ctaLink: '/quick'
+            },
+            // Returning users from email
+            'returning-user': {
+                image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Welcome Back',
+                subheadline: 'We saved your favorites. Ready to continue?',
+                ctaLabel: 'Continue Shopping',
+                ctaLink: '/favorites'
+            },
+            // YouTube visitors
+            'video-engaged': {
+                image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=80',
+                headline: 'As Seen On Video',
+                subheadline: 'The products our creators love to use.',
+                ctaLabel: 'Watch & Shop',
+                ctaLink: '/featured'
+            },
+            // Default fallback (used when no UTM/referrer match)
+            'default': {
+                image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80',
+                headline: 'Welcome to Our Store',
+                subheadline: 'Discover products you\'ll love.',
+                ctaLabel: 'Start Shopping',
+                ctaLink: '/shop'
             }
         };
 
-        // 2. Initialize Lua
-        const lua = new Lua({
-            store: Lua.stores.local,
-            debug: true
-        });
-
-        // 3. Define the Test
-        lua.define({
-            name: 'hero_content_test',
-            buckets: {
-                'seasonal': { weight: 1 },
-                'minimal': { weight: 1 },
-                'story': { weight: 1 }
-            }
-        });
-
-        // 4. Assign User
-        lua.assign();
-        const assignment = lua.assignments()['hero_content_test'] || 'seasonal';
-
-        // 5. Render Logic
-        function renderHero(variantKey) {
-            const container = document.getElementById('hero-container');
-            const data = heroTemplates[variantKey];
-
-            // Add specific class for styling
-            document.body.className = data.className;
-
-            container.innerHTML = `
-                <div class="hero">
-                    <div class="hero-content">
-                        <h1>${data.headline}</h1>
-                        <p>${data.subheadline}</p>
-                        <a href="#" class="btn">${data.ctaLabel}</a>
-                    </div>
-                </div>
-            `;
-
-            // Update Debug Panel
-            document.getElementById('current-variant').innerText = `Variant: ${variantKey}`;
-            console.log(`Rendered variant: ${variantKey}`);
+        // ===================================================================
+        // AI TOGGLE UI
+        // ===================================================================
+        var aiToggle = document.getElementById('ai-toggle');
+        var aiFields = document.getElementById('ai-fields');
+        if (aiToggle && aiFields) {
+            aiToggle.addEventListener('change', function() {
+                aiFields.style.display = this.checked ? 'block' : 'none';
+            });
         }
 
-        // 6. Reset Functionality
-        window.resetTest = function () {
-            localStorage.removeItem('ab-tests');
-            location.reload();
-        };
+        // ===================================================================
+        // INITIALIZATION
+        // ===================================================================
 
-        // Execution
-        renderHero(assignment);
+        // Wait for the personalization script to load and execute
+        document.addEventListener('DOMContentLoaded', function () {
+            // Wait for scripts to load (defer scripts load in order)
+            setTimeout(function() {
+                var api = window.LuaUTMPersonalize;
+                if (!api) {
+                    console.error('LuaUTMPersonalize not loaded');
+                    return;
+                }
 
+                // Standard personalization (no AI by default)
+                var decision = api.personalize({
+                    templates: userTemplates,
+                    log: true
+                });
+
+                // Handle both sync and async results
+                if (decision && typeof decision.then === 'function') {
+                    decision.then(function(d) { updateDebugPanel(d); });
+                } else {
+                    updateDebugPanel(decision);
+                }
+
+                // Show returning user info if available
+                if (window.LuaWeightedHistory) {
+                    var isReturning = window.LuaWeightedHistory.isReturningUser();
+                    if (isReturning) {
+                        console.log('[Demo] Returning user detected. History:', window.LuaWeightedHistory.getHistory());
+                    }
+                }
+            }, 150);
+        });
+
+        // ===================================================================
+        // AI PERSONALIZATION (triggered by button click)
+        // ===================================================================
+
+        function runAIPersonalization() {
+            var statusEl = document.getElementById('ai-status');
+            var apiKey = document.getElementById('ai-api-key').value.trim();
+            var model = document.getElementById('ai-model').value;
+            var mode = document.getElementById('ai-mode').value;
+
+            if (!apiKey) {
+                if (statusEl) statusEl.textContent = 'Please enter your OpenAI API key.';
+                return;
+            }
+
+            if (statusEl) statusEl.textContent = 'Running AI personalization...';
+
+            var api = window.LuaUTMPersonalize;
+            if (!api) {
+                if (statusEl) statusEl.textContent = 'Error: LuaUTMPersonalize not loaded.';
+                return;
+            }
+
+            // AI-powered personalization
+            var result = api.personalize({
+                templates: userTemplates,
+                enableAI: true,
+                aiConfig: {
+                    apiKey: apiKey,
+                    model: model,
+                    mode: mode,
+                    timeout: 8000,
+                    fallbackToStandard: true,
+                    cacheDecisions: true,
+                    historyEnabled: true,
+                    historyDecayRate: 0.9,
+                    maxHistorySize: 10,
+                    brandContext: {
+                        brandVoice: 'modern, clean, premium',
+                        targetAudience: 'online shoppers',
+                        productType: 'lifestyle and fashion products',
+                        industry: 'e-commerce'
+                    }
+                },
+                log: true
+            });
+
+            // AI always returns a Promise
+            if (result && typeof result.then === 'function') {
+                result.then(function(decision) {
+                    if (statusEl) {
+                        var info = 'AI decision applied.';
+                        if (decision.aiResponse) {
+                            info += ' Model: ' + (decision.aiResponse.model || 'N/A');
+                            info += ' | Confidence: ' + (decision.aiResponse.confidence || 'N/A');
+                            info += ' | Latency: ' + (decision.aiResponse.latency || '?') + 'ms';
+                        }
+                        if (decision.source === 'ai-cached') {
+                            info = 'Using cached AI decision.';
+                        }
+                        statusEl.textContent = info;
+                        statusEl.style.color = '#059669';
+                    }
+                    updateDebugPanel(decision);
+                }).catch(function(err) {
+                    if (statusEl) {
+                        statusEl.textContent = 'AI Error: ' + err.message;
+                        statusEl.style.color = '#dc2626';
+                    }
+                });
+            } else {
+                // Sync fallback was used
+                if (statusEl) {
+                    statusEl.textContent = 'Standard engine used (AI not available).';
+                    statusEl.style.color = '#d97706';
+                }
+                updateDebugPanel(result);
+            }
+        }
+
+        // ===================================================================
+        // DEBUG PANEL
+        // ===================================================================
+
+        function updateDebugPanel(decision) {
+            var debugInfo = document.getElementById('debug-info');
+            if (!debugInfo) return;
+
+            var api = window.LuaUTMPersonalize;
+            if (!api) {
+                debugInfo.innerHTML = '<div class="debug-row"><span class="debug-label">Status</span><span class="debug-value">Script not loaded</span></div>';
+                return;
+            }
+
+            var context = api.getContext();
+
+            if (!decision) {
+                decision = api.engine.standardDecide(context, { templates: userTemplates });
+            }
+
+            var html = '';
+
+            // Source styling
+            var sourceClass = 'debug-value';
+            if (decision.source === 'utm') sourceClass += ' utm-source';
+            else if (decision.source === 'referrer') sourceClass += ' referrer-source';
+            else if (decision.source === 'random-ab') sourceClass += ' random-source';
+            else if (decision.source === 'ai' || decision.source === 'ai-cached') sourceClass += ' utm-source';
+
+            html += row('Decision Source', decision.source, sourceClass);
+            html += row('Intent', decision.intent);
+            html += row('Has UTM', context.hasUTM ? 'Yes' : 'No');
+
+            // UTM params
+            if (context.hasUTM) {
+                for (var key in context.utm) {
+                    html += row(key, context.utm[key]);
+                }
+            }
+
+            html += row('Referrer', context.referrer.source + ' (' + context.referrer.category + ')');
+            html += row('Device', context.userAgent.isMobile ? 'Mobile' : (context.userAgent.isTablet ? 'Tablet' : 'Desktop'));
+
+            // Template info
+            if (decision.template) {
+                html += row('Headline', decision.template.headline || 'N/A');
+            } else {
+                html += row('Template', 'None (check console for errors)');
+            }
+
+            // AI-specific info
+            if (decision.aiResponse) {
+                html += row('AI Model', decision.aiResponse.model || 'N/A');
+                html += row('AI Mode', decision.aiResponse.mode || 'N/A');
+                html += row('Confidence', decision.aiResponse.confidence || 'N/A');
+                html += row('Latency', (decision.aiResponse.latency || '?') + 'ms');
+                if (decision.aiResponse.reasoning) {
+                    html += row('Reasoning', decision.aiResponse.reasoning);
+                }
+            }
+
+            // History info
+            if (window.LuaWeightedHistory) {
+                var historyModule = window.LuaWeightedHistory;
+                html += row('Returning User', historyModule.isReturningUser() ? 'Yes' : 'No');
+                var history = historyModule.getHistory();
+                html += row('Visit Count', history.visits ? history.visits.length : 0);
+            }
+
+            debugInfo.innerHTML = html;
+        }
+
+        function row(label, value, valueClass) {
+            valueClass = valueClass || 'debug-value';
+            return '<div class="debug-row"><span class="debug-label">' + label + '</span><span class="' + valueClass + '">' + (value || '') + '</span></div>';
+        }
+
+        function resetAndReload() {
+            window.location.href = window.location.pathname;
+        }
+
+        function clearAIHistory() {
+            if (window.LuaWeightedHistory) {
+                window.LuaWeightedHistory.clearHistory();
+            }
+            if (window.LuaAIPersonalize) {
+                window.LuaAIPersonalize.clearCache();
+            }
+            alert('History and AI cache cleared.');
+            window.location.reload();
+        }
     </script>
 </body>
 

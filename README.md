@@ -18,9 +18,13 @@ You can download the compiled javascript directly [here](/build/lua.js)
 
 * [Features](#features)
 * [Installing](#installing)
+* [Developing](#developing)
+* [Run the demo](#run-the-demo)
 * [Usage](#usage)
 * [API](#api)
 * [Guide/FAQ](#guidefaq)
+* [AI-Powered Personalization](#ai-powered-personalization)
+* [Push to GitHub](#push-to-github)
 * [License](#license)
 
 ***
@@ -32,8 +36,11 @@ You can download the compiled javascript directly [here](/build/lua.js)
 * Intelligent weighted bucketing
 * Browser & Server support
 * Storage Drivers: `localStorage`, `cookies`, `memory`, or build your own
+* **AI-Powered Personalization** using OpenAI GPT models (opt-in)
+* **UTM-Based Content Personalization** with automatic intent inference
+* **Weighted User History** with exponential decay for returning visitors
 * Well documented, tested, and proven in high production environments
-* Lightweight, weighing in at ~ <span class="size">`3.8kb`</span>.
+* Lightweight, weighing in at ~ <span class="size">`3.8kb`</span> (core), with optional AI modules
 * Not tested on animals
 
 ## Installing
@@ -52,11 +59,65 @@ yarn add lua
 ## Developing
 
 ```bash
-npm install # Install dependencies
-npm build # Build the babel'd version
-npm lint # Run linting
-npm test # Run tests
+# Install dependencies (use pnpm, npm, or yarn)
+pnpm install
+# OR: npm install
+# OR: yarn install
+
+# Build the library
+pnpm run build
+# OR: npm run build
+
+# Run linting
+pnpm run lint
+# OR: npm run lint
+
+# Run all tests (83 tests across 6 suites)
+pnpm test
+# OR: npm test
 ```
+
+### Run a single test file
+
+```bash
+# Run only core Lua tests
+pnpm test -- src/__tests__/unit.js
+
+# Run only AI personalization tests
+pnpm test -- src/__tests__/ai-personalize.test.js
+
+# Run only weighted history tests
+pnpm test -- src/__tests__/weighted-history.test.js
+```
+
+## Run the demo
+
+Try the UTM personalization and AI-powered demo locally:
+
+```bash
+# From the project root, start a local server (pick one):
+
+# Option 1: Node (npx serve)
+npx serve . -p 3000
+
+# Option 2: Python 3
+python3 -m http.server 8000
+
+# Option 3: PHP
+php -S localhost:8080
+```
+
+Then open in your browser:
+
+- **Demo page**: [http://localhost:3000/demo/index.html](http://localhost:3000/demo/index.html) (use your port: 3000, 8000, or 8080)
+
+On the demo page you can:
+
+- Use the **Test UTM Links** in the debug panel to simulate traffic from Google, Facebook, Reddit, etc.
+- Toggle **Enable AI Mode**, add your OpenAI API key, and click **Run AI Personalization** to see AI-driven content selection.
+- Use **Reset & Reload** to clear UTM params, or **Clear AI History & Cache** to reset stored history.
+
+**Note:** The demo uses script paths like `../src/utm-personalize.js`, so it must be served from the project root (not by opening `demo/index.html` as a file).
 
 ## Usage
 
@@ -304,6 +365,95 @@ const buckets = lua.assignments();
 const bucket = buckets['new-homepage'];
 const bar = defs.buckets[bucket].foo; // "bar"
 ```
+
+## AI-Powered Personalization
+
+Lua includes an optional AI personalization engine that uses OpenAI GPT models to make intelligent content decisions. The AI analyzes UTM parameters, referrer data, device type, and user visit history to select the best content variant or generate new personalized content.
+
+### Quick Setup
+
+```html
+<!-- Include AI modules after the core script -->
+<script src="utm-personalize.js" defer></script>
+<script src="storage/weighted-history.js" defer></script>
+<script src="prompts/personalization-prompts.js" defer></script>
+<script src="ai-personalize.js" defer></script>
+```
+
+```javascript
+// Enable AI personalization
+LuaUTMPersonalize.personalize({
+    templates: {
+        'gaming':      { headline: 'Level Up Your Setup', subheadline: '...', ctaLabel: 'Explore Gaming', ctaLink: '/gaming' },
+        'professional': { headline: 'Work Smarter', subheadline: '...', ctaLabel: 'View Collection', ctaLink: '/pro' },
+        'default':     { headline: 'Welcome', subheadline: '...', ctaLabel: 'Shop Now', ctaLink: '/shop' }
+    },
+    enableAI: true,
+    aiConfig: {
+        apiKey: 'sk-your-openai-key',   // Your OpenAI API key
+        model: 'gpt-4o-mini',           // Default model (configurable)
+        mode: 'select'                   // 'select' or 'generate'
+    }
+}).then(function(decision) {
+    console.log('AI chose:', decision.intent, 'with confidence:', decision.aiResponse.confidence);
+});
+```
+
+### Two Modes
+
+**Select Mode**: AI chooses the best variant from your predefined templates. Predictable, fast, brand-consistent.
+
+**Generate Mode**: AI creates entirely new headline, subheadline, and CTA text based on user context and your brand guidelines.
+
+### Key Features
+
+- **Default model**: `gpt-4o-mini` (configurable to any OpenAI model)
+- **Weighted history**: Tracks returning users with exponential decay
+- **Automatic caching**: Caches AI decisions to minimize API calls
+- **Graceful fallback**: Falls back to standard UTM engine if AI fails
+- **Proxy support**: Use `apiUrl` instead of `apiKey` for production security
+
+For comprehensive setup instructions, configuration reference, and security best practices, see the [AI Personalization Guide](docs/AI_PERSONALIZATION_GUIDE.md).
+
+***
+
+## Push to GitHub
+
+To commit your changes and push to GitHub:
+
+```bash
+# 1. Stage all changes
+git add .
+
+# 2. Commit with a descriptive message
+git commit -m "feat: your change description"
+
+# 3. Push to your remote (e.g. origin master or main)
+git push origin master
+# OR, if your default branch is main:
+# git push origin main
+```
+
+Before pushing, it’s a good idea to run the build and tests:
+
+```bash
+pnpm run build
+pnpm test
+git add .
+git commit -m "your message"
+git push origin master
+```
+
+To publish the demo to **GitHub Pages** (so others can try it online):
+
+```bash
+pnpm run pages
+# OR: npm run pages
+```
+
+This pushes the `master` branch to the `gh-pages` branch; the demo will be available at `https://<your-username>.github.io/Lua-Dynamic-Website-/` (or your repo’s Pages URL).
+
+***
 
 ## License
 
