@@ -95,21 +95,34 @@ pnpm test -- src/__tests__/weighted-history.test.js
 Try the UTM personalization and AI-powered demo locally:
 
 ```bash
-# From the project root, start a local server (pick one):
+# Option 1: Test server with auto-loaded API key (RECOMMENDED)
+pnpm run test:demo
+# OR: node test-demo.js
 
-# Option 1: Node (npx serve)
+# This will:
+# - Read your OpenAI API key from .env file
+# - Auto-fill the API key in the demo
+# - Enable AI mode by default
+# - Serve at http://localhost:3000/demo
+```
+
+If you don't need AI features, you can use a generic static server instead:
+
+```bash
+# Option 2: Node (npx serve)
 npx serve . -p 3000
 
-# Option 2: Python 3
+# Option 3: Python 3
 python3 -m http.server 8000
 
-# Option 3: PHP
+# Option 4: PHP
 php -S localhost:8080
 ```
 
 Then open in your browser:
 
-- **Demo page**: [http://localhost:3000/demo/index.html](http://localhost:3000/demo/index.html) (use your port: 3000, 8000, or 8080)
+- **Option 1**: [http://localhost:3000/demo](http://localhost:3000/demo) (test server — AI auto-configured)
+- **Options 2-4**: [http://localhost:3000/demo/index.html](http://localhost:3000/demo/index.html) (use your port: 3000, 8000, or 8080)
 
 On the demo page you can:
 
@@ -117,7 +130,7 @@ On the demo page you can:
 - Toggle **Enable AI Mode**, add your OpenAI API key, and click **Run AI Personalization** to see AI-driven content selection.
 - Use **Reset & Reload** to clear UTM params, or **Clear AI History & Cache** to reset stored history.
 
-**Note:** The demo uses script paths like `../src/utm-personalize.js`, so it must be served from the project root (not by opening `demo/index.html` as a file).
+**Note:** The demo uses script paths like `../src/utm-personalize.js`, so it must be served from the project root (not by opening `demo/index.html` as a file). The recommended `test-demo.js` handles this automatically.
 
 ## Usage
 

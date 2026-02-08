@@ -28,6 +28,7 @@
     "lint": "eslint . --fix",
     "lint:ci": "eslint .",
     "test": "jest",
+    "test:demo": "node test-demo.js",
     "pages": "git push -f origin master:gh-pages"
   },
   "dependencies": {

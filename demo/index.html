@@ -369,7 +369,7 @@
                     <option value="select" selected>Select Mode (pick best variant)</option>
                     <option value="generate">Generate Mode (AI writes content)</option>
                 </select>
-                <button onclick="runAIPersonalization()" style="width:100%;padding:0.4rem;font-size:0.75rem;background:#2563eb;color:white;border:none;border-radius:3px;cursor:pointer;margin-bottom:0.3rem;">
+                <button type="button" onclick="runAIPersonalization()" style="width:100%;padding:0.4rem;font-size:0.75rem;background:#2563eb;color:white;border:none;border-radius:3px;cursor:pointer;margin-bottom:0.3rem;">
                     Run AI Personalization
                 </button>
                 <div id="ai-status" style="font-size:0.65rem;color:#666;"></div>
@@ -378,14 +378,14 @@
 
         <div class="utm-links">
             <strong>Test UTM Links:</strong>
-            <a href="?utm_source=google&utm_medium=cpc&utm_campaign=summer_sale">Google Ads - Sale Campaign</a>
-            <a href="?utm_source=facebook&utm_medium=social&utm_campaign=gaming_promo">Facebook - Gaming</a>
-            <a href="?utm_source=twitter&utm_medium=social&utm_campaign=brand_story">Twitter - Brand Story</a>
-            <a href="?utm_source=email&utm_medium=newsletter&utm_campaign=welcome_back">Email - Returning User</a>
-            <a href="?utm_source=youtube&utm_medium=video&utm_campaign=creative_tools">YouTube - Creative</a>
-            <a href="?utm_source=instagram&utm_medium=social">Instagram - Social</a>
-            <a href="?utm_source=linkedin&utm_medium=professional&utm_campaign=office_gear">LinkedIn - Professional</a>
-            <a href="?">No UTM (Random A/B)</a>
+            <a href="/demo?utm_source=google&utm_medium=cpc&utm_campaign=summer_sale">Google Ads - Sale Campaign</a>
+            <a href="/demo?utm_source=facebook&utm_medium=social&utm_campaign=gaming_promo">Facebook - Gaming</a>
+            <a href="/demo?utm_source=twitter&utm_medium=social&utm_campaign=brand_story">Twitter - Brand Story</a>
+            <a href="/demo?utm_source=email&utm_medium=newsletter&utm_campaign=welcome_back">Email - Returning User</a>
+            <a href="/demo?utm_source=youtube&utm_medium=video&utm_campaign=creative_tools">YouTube - Creative</a>
+            <a href="/demo?utm_source=instagram&utm_medium=social">Instagram - Social</a>
+            <a href="/demo?utm_source=linkedin&utm_medium=professional&utm_campaign=office_gear">LinkedIn - Professional</a>
+            <a href="/demo">No UTM (Random A/B)</a>
         </div>
         <button onclick="resetAndReload()">Reset & Reload (No UTM)</button>
         <button onclick="clearAIHistory()" style="margin-top:0.25rem;">Clear AI History & Cache</button>
@@ -505,10 +505,38 @@
         // ===================================================================
         var aiToggle = document.getElementById('ai-toggle');
         var aiFields = document.getElementById('ai-fields');
+        var apiKeyInput = document.getElementById('ai-api-key');
+        
         if (aiToggle && aiFields) {
             aiToggle.addEventListener('change', function() {
                 aiFields.style.display = this.checked ? 'block' : 'none';
             });
+        }
+        
+        // Auto-populate API key from localStorage or URL parameter
+        if (apiKeyInput) {
+            // Check URL parameter first
+            var urlParams = new URLSearchParams(window.location.search);
+            var urlApiKey = urlParams.get('apiKey');
+            
+            // Check localStorage
+            var storedApiKey = localStorage.getItem('lua_demo_api_key');
+            
+            // Use URL param, then localStorage, then empty
+            var apiKeyToUse = urlApiKey || storedApiKey || '';
+            
+            if (apiKeyToUse) {
+                apiKeyInput.value = apiKeyToUse;
+                // Auto-enable AI mode if key is present
+                if (aiToggle) {
+                    aiToggle.checked = true;
+                    if (aiFields) aiFields.style.display = 'block';
+                }
+                // Save to localStorage for next time
+                if (!urlApiKey && storedApiKey !== apiKeyToUse) {
+                    localStorage.setItem('lua_demo_api_key', apiKeyToUse);
+                }
+            }
         }
 
         // ===================================================================
@@ -525,17 +553,113 @@
                     return;
                 }
 
-                // Standard personalization (no AI by default)
-                var decision = api.personalize({
-                    templates: userTemplates,
-                    log: true
-                });
+                // Check if AI should run (from "Run AI Personalization" button)
+                var shouldRunAI = false;
+                var aiConfig = null;
+                try {
+                    shouldRunAI = sessionStorage.getItem('lua-demo-run-ai') === 'true';
+                    var savedConfig = localStorage.getItem('lua-demo-ai-config');
+                    if (savedConfig) {
+                        aiConfig = JSON.parse(savedConfig);
+                    }
+                    // Clear the flag after reading
+                    sessionStorage.removeItem('lua-demo-run-ai');
+                } catch (e) {
+                    console.warn('Could not read storage:', e);
+                }
 
-                // Handle both sync and async results
-                if (decision && typeof decision.then === 'function') {
-                    decision.then(function(d) { updateDebugPanel(d); });
+                // If AI should run, use AI personalization with generate mode
+                if (shouldRunAI && aiConfig && aiConfig.enabled && aiConfig.apiKey) {
+                    // Update UI to reflect AI mode
+                    var aiToggle = document.getElementById('ai-toggle');
+                    var aiApiKey = document.getElementById('ai-api-key');
+                    var aiModel = document.getElementById('ai-model');
+                    var aiMode = document.getElementById('ai-mode');
+                    var aiFields = document.getElementById('ai-fields');
+                    
+                    if (aiToggle) aiToggle.checked = true;
+                    if (aiApiKey) aiApiKey.value = aiConfig.apiKey;
+                    if (aiModel) aiModel.value = aiConfig.model || 'gpt-4o-mini';
+                    if (aiMode) aiMode.value = 'generate';
+                    if (aiFields) aiFields.style.display = 'block';
+
+                    // Run AI personalization in generate mode
+                    var statusEl = document.getElementById('ai-status');
+                    if (statusEl) statusEl.textContent = 'Running AI personalization...';
+
+                    var result = api.personalize({
+                        templates: userTemplates,
+                        enableAI: true,
+                        aiConfig: {
+                            apiKey: aiConfig.apiKey,
+                            model: aiConfig.model || 'gpt-4o-mini',
+                            mode: 'generate', // Force generate mode
+                            timeout: 8000,
+                            fallbackToStandard: true,
+                            cacheDecisions: true,
+                            historyEnabled: true,
+                            historyDecayRate: 0.9,
+                            maxHistorySize: 10,
+                            brandContext: {
+                                brandVoice: 'modern, clean, premium',
+                                targetAudience: 'online shoppers',
+                                productType: 'lifestyle and fashion products',
+                                industry: 'e-commerce'
+                            }
+                        },
+                        log: true
+                    });
+
+                    // Handle async AI result
+                    if (result && typeof result.then === 'function') {
+                        result.then(function(decision) {
+                            if (statusEl) {
+                                var info = 'AI generative content applied.';
+                                if (decision.aiResponse) {
+                                    info += ' Model: ' + (decision.aiResponse.model || 'N/A');
+                                    info += ' | Confidence: ' + (decision.aiResponse.confidence || 'N/A');
+                                    info += ' | Latency: ' + (decision.aiResponse.latency || '?') + 'ms';
+                                }
+                                if (decision.source === 'ai-cached') {
+                                    info = 'Using cached AI decision.';
+                                }
+                                statusEl.textContent = info;
+                                statusEl.style.color = '#059669';
+                            }
+                            updateDebugPanel(decision);
+                        }).catch(function(err) {
+                            if (statusEl) {
+                                statusEl.textContent = 'AI Error: ' + err.message;
+                                statusEl.style.color = '#dc2626';
+                            }
+                            console.error('[Demo] AI personalization error:', err);
+                            // Fallback to standard
+                            var fallback = api.personalize({
+                                templates: userTemplates,
+                                log: true
+                            });
+                            if (fallback && typeof fallback.then === 'function') {
+                                fallback.then(function(d) { updateDebugPanel(d); });
+                            } else {
+                                updateDebugPanel(fallback);
+                            }
+                        });
+                    } else {
+                        updateDebugPanel(result);
+                    }
                 } else {
-                    updateDebugPanel(decision);
+                    // Standard personalization (no AI by default)
+                    var decision = api.personalize({
+                        templates: userTemplates,
+                        log: true
+                    });
+
+                    // Handle both sync and async results
+                    if (decision && typeof decision.then === 'function') {
+                        decision.then(function(d) { updateDebugPanel(d); });
+                    } else {
+                        updateDebugPanel(decision);
+                    }
                 }
 
                 // Show returning user info if available
@@ -554,78 +678,42 @@
 
         function runAIPersonalization() {
             var statusEl = document.getElementById('ai-status');
-            var apiKey = document.getElementById('ai-api-key').value.trim();
-            var model = document.getElementById('ai-model').value;
-            var mode = document.getElementById('ai-mode').value;
+            var apiKeyEl = document.getElementById('ai-api-key');
+            var apiKey = apiKeyEl ? apiKeyEl.value.trim() : '';
+            var modelEl = document.getElementById('ai-model');
+            var model = modelEl ? modelEl.value : 'gpt-4o-mini';
+            var modeEl = document.getElementById('ai-mode');
+            var mode = modeEl ? modeEl.value : 'generate';
 
             if (!apiKey) {
                 if (statusEl) statusEl.textContent = 'Please enter your OpenAI API key.';
                 return;
             }
 
-            if (statusEl) statusEl.textContent = 'Running AI personalization...';
-
-            var api = window.LuaUTMPersonalize;
-            if (!api) {
-                if (statusEl) statusEl.textContent = 'Error: LuaUTMPersonalize not loaded.';
-                return;
-            }
-
-            // AI-powered personalization
-            var result = api.personalize({
-                templates: userTemplates,
-                enableAI: true,
-                aiConfig: {
+            // Save AI config to localStorage for page reload
+            try {
+                localStorage.setItem('lua-demo-ai-config', JSON.stringify({
                     apiKey: apiKey,
                     model: model,
-                    mode: mode,
-                    timeout: 8000,
-                    fallbackToStandard: true,
-                    cacheDecisions: true,
-                    historyEnabled: true,
-                    historyDecayRate: 0.9,
-                    maxHistorySize: 10,
-                    brandContext: {
-                        brandVoice: 'modern, clean, premium',
-                        targetAudience: 'online shoppers',
-                        productType: 'lifestyle and fashion products',
-                        industry: 'e-commerce'
-                    }
-                },
-                log: true
-            });
-
-            // AI always returns a Promise
-            if (result && typeof result.then === 'function') {
-                result.then(function(decision) {
-                    if (statusEl) {
-                        var info = 'AI decision applied.';
-                        if (decision.aiResponse) {
-                            info += ' Model: ' + (decision.aiResponse.model || 'N/A');
-                            info += ' | Confidence: ' + (decision.aiResponse.confidence || 'N/A');
-                            info += ' | Latency: ' + (decision.aiResponse.latency || '?') + 'ms';
-                        }
-                        if (decision.source === 'ai-cached') {
-                            info = 'Using cached AI decision.';
-                        }
-                        statusEl.textContent = info;
-                        statusEl.style.color = '#059669';
-                    }
-                    updateDebugPanel(decision);
-                }).catch(function(err) {
-                    if (statusEl) {
-                        statusEl.textContent = 'AI Error: ' + err.message;
-                        statusEl.style.color = '#dc2626';
-                    }
-                });
-            } else {
-                // Sync fallback was used
-                if (statusEl) {
-                    statusEl.textContent = 'Standard engine used (AI not available).';
-                    statusEl.style.color = '#d97706';
-                }
-                updateDebugPanel(result);
+                    mode: 'generate',
+                    enabled: true
+                }));
+            } catch (e) {
+                console.warn('Could not save to localStorage:', e);
             }
+
+            // Set flag to trigger AI on page load
+            try {
+                sessionStorage.setItem('lua-demo-run-ai', 'true');
+            } catch (e) {
+                console.warn('Could not save to sessionStorage:', e);
+            }
+
+            // Show feedback then force page refresh so AI runs on load
+            if (statusEl) statusEl.textContent = 'Refreshing to run AI...';
+            setTimeout(function() {
+                window.location.reload();
+            }, 100);
         }
 
         // ===================================================================
@@ -706,7 +794,7 @@
         }
 
         function resetAndReload() {
-            window.location.href = window.location.pathname;
+            window.location.href = '/demo';
         }
 
         function clearAIHistory() {
