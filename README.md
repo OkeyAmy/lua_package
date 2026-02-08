@@ -1,5 +1,5 @@
 <a href="https://github.com/OkeyAmy/lua_package/">
-  <img src="assets/lua-v2.svg">
+  <img src="assets/lua-v1.2.svg">
 </a>
 
 > A progressive, client/server AB testing library.
