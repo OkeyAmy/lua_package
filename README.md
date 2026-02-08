@@ -16,6 +16,77 @@ Lua is an AB testing library designed to be clear, minimal, and flexible. It wor
 
 You can download the compiled javascript directly [here](/build/lua.js)
 
+**[Watch the demo video](https://www.youtube.com/watch?v=e5tgfkSQ1uc)** — UTM personalization and AI-powered content in action.
+
+---
+
+## Problem Statement
+
+Enterprises and product teams need to show the right message to the right user at the right time—without maintaining separate pages per campaign or channel. Static copy forces one-size-fits-all experiences: the same headline for a paid ad visitor and an organic social visitor, the same CTA for first-time and returning users. Manual A/B tests scale poorly, and full-stack personalization often requires heavy platforms, server-side logic, and ongoing engineering. Developers and marketers need a lightweight, programmable way to run experiments and personalize content by traffic source, intent, and history while keeping the core site simple and fast.
+
+---
+
+## Solution
+
+Lua provides a **progressive, client/server A/B testing and personalization layer** that stays small and optional. You define tests and content variants in code; Lua handles bucketing, persistence, and—optionally—UTM- and AI-driven personalization. No separate CMS or experimentation platform is required. Use the core for classic A/B or multivariate tests; add UTM-based personalization to tailor content by campaign and channel; opt in to AI (OpenAI) to select the best variant or generate dynamic copy from context. Everything can run in the browser with pluggable storage (localStorage, cookies, memory) or on the server, so it fits static sites, SPAs, and full-stack apps. The library is documented, tested, and built so enterprise teams and developers can ship dynamic website experiences without rewriting their stack.
+
+---
+
+## Core Features
+
+| Area | Capability |
+|------|------------|
+| **A/B & multivariate testing** | Define tests with weighted buckets (A/B/C/D…), assign users consistently, persist via configurable storage drivers. |
+| **UTM-based personalization** | Infer intent from `utm_source`, `utm_medium`, `utm_campaign`, referrer, and device; show the best-matching content variant automatically. |
+| **AI-powered personalization** | Optional OpenAI integration: **Select** mode picks the best predefined variant; **Generate** mode creates headline, subheadline, and CTA copy from context and brand guidelines. |
+| **Weighted user history** | Store visit context in localStorage with exponential decay; returning users get personalization that considers both current UTM and past behavior. |
+| **Runtime & storage** | Browser and server support; drivers for `localStorage`, cookies, memory, or custom stores. |
+| **Performance & safety** | Lightweight core (~3.8kb); optional AI with caching, timeouts, retries, and fallback to rule-based engine; proxy support for keeping API keys off the client. |
+
+---
+
+## Implementation & Technology
+
+- **Integration**: Script tags or bundler; no framework lock-in. Works with static HTML, React, Vue, or any JS environment.
+- **Persistence**: Pluggable store interface; built-in drivers for `localStorage`, cookies, and in-memory; custom drivers for server or hybrid use.
+- **Personalization pipeline**: UTM parsing → intent inference → variant selection (or AI select/generate) → DOM or data application via `data-personalize` and templates.
+- **AI path**: Configurable model (default `gpt-4o-mini`), optional proxy URL for production, structured prompts, and validation of AI responses with fallback.
+- **Testing & quality**: Jest test suites for core, AI, and weighted history; lint and build via npm/pnpm scripts; demo server for local tryout with optional API key injection.
+
+---
+
+## Expected Results (Enterprise, Developers, End Users)
+
+| Audience | Outcome |
+|----------|--------|
+| **Enterprise / product teams** | One library for A/B tests and dynamic copy; fewer one-off integrations; control over variants and brand voice; optional AI without vendor lock-in. |
+| **Developers** | Clear API, small bundle, standard JS; add UTM or AI without rewriting the app; run tests and demo locally; deploy to CDN or existing stack. |
+| **Marketers / growth** | Campaign-specific messaging (e.g. Google vs Facebook vs email) and returning-user awareness without separate landing pages or complex tooling. |
+| **End users** | Relevant headlines and CTAs based on where they came from and prior visits; faster, more consistent experience with minimal layout shift. |
+
+---
+
+## Technology Used
+
+| Layer | Technology |
+|-------|------------|
+| **Language** | JavaScript (ES5+); Babel for legacy builds. |
+| **Build** | Rollup; UMD + ES module outputs; minification. |
+| **Testing** | Jest; unit and integration tests for core Lua, UTM, AI personalization, weighted history. |
+| **Linting** | ESLint. |
+| **AI / personalization** | OpenAI Chat Completions API (e.g. gpt-4o-mini); fetch with retry and timeout; optional backend proxy. |
+| **Storage (browser)** | localStorage (weighted history, AI cache); configurable cookie or memory stores. |
+| **Runtime** | Browser and Node; no framework dependency. |
+
+---
+
+* [Demo video](https://www.youtube.com/watch?v=e5tgfkSQ1uc)
+* [Problem Statement](#problem-statement)
+* [Solution](#solution)
+* [Core Features](#core-features)
+* [Implementation & Technology](#implementation--technology)
+* [Expected Results](#expected-results-enterprise-developers-end-users)
+* [Technology Used](#technology-used)
 * [Features](#features)
 * [Installing](#installing)
 * [Developing](#developing)
