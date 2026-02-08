@@ -1,6 +1,6 @@
 {
   "name": "@okeyamy/lua",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "author": "Okey Amy <amaobiokeoma@gmail.com>",
   "homepage": "https://github.com/OkeyAmy/lua_package/",
   "description": "A client side A/B tester",
