@@ -1,0 +1,18 @@
+{
+  "name": "lua",
+  "homepage": "https://github.com/dollarshaveclub/lua",
+  "authors": [
+    "Okey Amy <amaobiokeoma@gmail.com>"
+  ],
+  "description": "A client side A/B tester",
+  "main": "build/lua.js",
+  "keywords": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "assets",
+    "test",
+    "tests"
+  ]
+}

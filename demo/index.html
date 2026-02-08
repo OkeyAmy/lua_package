@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua E-commerce Demo</title>
+    <style>
+        :root {
+            --primary-color: #111;
+            --secondary-color: #666;
+            --accent-color: #000;
+            --bg-color: #fff;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            line-height: 1.5;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        nav a {
+            margin-left: 2rem;
+            text-decoration: none;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section (The Test Target) */
+        .hero {
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            color: white;
+            transition: all 0.5s ease;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            /* Overlay for readability */
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background-color: white;
+            color: black;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Custom Styles for Variants */
+        /* Seasonal: Bold, Warm */
+        .variant-seasonal .hero {
+            background-image: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1600&q=80');
+        }
+
+        .variant-seasonal .btn {
+            background-color: #ff4757;
+            color: white;
+        }
+
+        /* Minimal: Clean, High-end */
+        .variant-minimal .hero {
+            background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80');
+        }
+
+        .variant-minimal .hero h1 {
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        /* Story: Lifestyle, Narrative */
+        .variant-story .hero {
+            background-image: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=80');
+        }
+
+        .variant-story .hero::before {
+            background: rgba(0, 0, 0, 0.5);
+            /* Darker overlay */
+        }
+
+        /* Product Grid (Static) */
+        .products {
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .product-img {
+            height: 300px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: #666;
+        }
+
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            font-size: 0.85rem;
+        }
+
+        .debug-panel button {
+            background: #eee;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .debug-panel button:hover {
+            background: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">LUXE.</div>
+        <nav>
+            <a href="#">Shop</a>
+            <a href="#">Collections</a>
+            <a href="#">About</a>
+            <a href="#">Cart (0)</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section: Content will be injected by Lua -->
+    <div id="hero-container" class="hero-wrapper">
+        <!-- Rendered by JS -->
+    </div>
+
+    <section class="products">
+        <!-- Static placeholders -->
+        <div class="product-card">
+            <div class="product-img">Product Bundle 1</div>
+            <div class="product-info">
+                <div class="product-title">Classic Tee</div>
+                <div class="product-price">$29.00</div>
+            </div>
+        </div>
+        <div class="product-card">
+            <div class="product-img">Product Bundle 2</div>
+            <div class="product-info">
+                <div class="product-title">Denim Jacket</div>
+                <div class="product-price">$89.00</div>
+            </div>
+        </div>
+        <div class="product-card">
+            <div class="product-img">Product Bundle 3</div>
+            <div class="product-info">
+                <div class="product-title">Leather Boots</div>
+                <div class="product-price">$149.00</div>
+            </div>
+        </div>
+        <div class="product-card">
+            <div class="product-img">Product Bundle 4</div>
+            <div class="product-info">
+                <div class="product-title">Wool Scarf</div>
+                <div class="product-price">$39.00</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+        <strong>Lua Debug</strong>
+        <div id="current-variant">Variant: Loading...</div>
+        <button onclick="resetTest()">Reset Assignment</button>
+    </div>
+
+    <script src="../build/lua.js"></script>
+    <script>
+        // 1. Template Registry / Content Data
+        const heroTemplates = {
+            'seasonal': {
+                headline: 'Summer Sale is Here',
+                subheadline: 'Up to 50% off select styles. Limited time only.',
+                ctaLabel: 'Shop the Sale',
+                className: 'variant-seasonal'
+            },
+            'minimal': {
+                headline: 'The New Essentials',
+                subheadline: 'Timeless pieces for the modern wardrobe.',
+                ctaLabel: 'View Collection',
+                className: 'variant-minimal'
+            },
+            'story': {
+                headline: 'Crafted with Care',
+                subheadline: 'Sustainable materials, ethically sourced.',
+                ctaLabel: 'Our Story',
+                className: 'variant-story'
+            }
+        };
+
+        // 2. Initialize Lua
+        const lua = new Lua({
+            store: Lua.stores.local,
+            debug: true
+        });
+
+        // 3. Define the Test
+        lua.define({
+            name: 'hero_content_test',
+            buckets: {
+                'seasonal': { weight: 1 },
+                'minimal': { weight: 1 },
+                'story': { weight: 1 }
+            }
+        });
+
+        // 4. Assign User
+        lua.assign();
+        const assignment = lua.assignments()['hero_content_test'] || 'seasonal';
+
+        // 5. Render Logic
+        function renderHero(variantKey) {
+            const container = document.getElementById('hero-container');
+            const data = heroTemplates[variantKey];
+
+            // Add specific class for styling
+            document.body.className = data.className;
+
+            container.innerHTML = `
+                <div class="hero">
+                    <div class="hero-content">
+                        <h1>${data.headline}</h1>
+                        <p>${data.subheadline}</p>
+                        <a href="#" class="btn">${data.ctaLabel}</a>
+                    </div>
+                </div>
+            `;
+
+            // Update Debug Panel
+            document.getElementById('current-variant').innerText = `Variant: ${variantKey}`;
+            console.log(`Rendered variant: ${variantKey}`);
+        }
+
+        // 6. Reset Functionality
+        window.resetTest = function () {
+            localStorage.removeItem('ab-tests');
+            location.reload();
+        };
+
+        // Execution
+        renderHero(assignment);
+
+    </script>
+</body>
+
+</html>
