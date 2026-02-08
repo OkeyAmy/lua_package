@@ -2,7 +2,7 @@
   "name": "@okeyamy/lua",
   "version": "5.0.4",
   "author": "Okey Amy <amaobiokeoma@gmail.com>",
-  "homepage": "https://github.com/OkeyAmy/Lua-Dynamic-Website-",
+  "homepage": "https://github.com/OkeyAmy/lua_package/",
   "description": "A client side A/B tester",
   "license": "MIT",
   "main": "build/lua.js",
@@ -10,7 +10,7 @@
   "unpkg": "build/lua.min.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dollarshaveclub/lua.git"
+    "url": "https://github.com/OkeyAmy/lua_package.git"
   },
   "scripts": {
     "build": "rollup --config configs/rollup.config.js",

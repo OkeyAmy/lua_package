@@ -1,4 +1,4 @@
-<a href="https://github.com/OkeyAmy/Lua-Dynamic-Website-">
+<a href="https://github.com/OkeyAmy/lua_package/">
   <img src="assets/lua-v2.svg">
 </a>
 
@@ -7,10 +7,10 @@
 [![npm][npm-image]][npm-url]
 [![bower][bower-image]][bower-url]
 
-[npm-image]: https://badge.fury.io/js/lua.svg
-[npm-url]: https://www.npmjs.com/package/lua
+[npm-image]: https://badge.fury.io/js/%40okeyamy%2Flua.svg
+[npm-url]: https://www.npmjs.com/package/@okeyamy/lua
 [bower-image]: https://badge.fury.io/bo/lua.svg
-[bower-url]: https://github.com/OkeyAmy/Lua-Dynamic-Website-
+[bower-url]: https://github.com/OkeyAmy/lua_package/
 
 Lua is an AB testing library designed to be clear, minimal, and flexible. It works in both the server and browser with the use of driver-based persistence layers.
 
@@ -535,7 +535,7 @@ pnpm run pages
 # OR: npm run pages
 ```
 
-This pushes the `master` branch to the `gh-pages` branch; the demo will be available at `https://<your-username>.github.io/Lua-Dynamic-Website-/` (or your repo’s Pages URL).
+This pushes the `master` branch to the `gh-pages` branch; the demo will be available at `https://<your-username>.github.io/lua_package/` (or your repo’s Pages URL).
 
 ***
 
