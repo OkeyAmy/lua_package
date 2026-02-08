@@ -22,7 +22,7 @@
     "chore:pr": "git add . && git commit -m '[chore] updates changelog' --no-verify && git push origin chore-changelog -f",
     "chore:setup-changelog": "git checkout master && git pull",
     "chore": "npm run chore:delete-changelog-branch && npm run chore:branch && npm run chore:changelog && npm run chore:pr && npm run chore:setup-next-work",
-    "postpublish": "git tag $npm_package_version && git push origin --tags && npm run chore",
+    "postpublish": "git tag $npm_package_version && git push origin --tags",
     "prepublish": "npm run build-es5",
     "prepush": "npm run build && npm test",
     "lint": "eslint . --fix",
