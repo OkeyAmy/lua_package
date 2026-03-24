@@ -1,7 +1,7 @@
 /**
-  lua - A client side A/B tester
-  @version v5.0.3
-  @link https://github.com/OkeyAmy/Lua-Dynamic-Website-
+  @okeyamy/lua - A client side A/B tester
+  @version v5.0.4
+  @link https://github.com/OkeyAmy/lua_package/
   @author Okey Amy <amaobiokeoma@gmail.com>
   @license MIT
 **/

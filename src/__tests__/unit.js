@@ -33,7 +33,7 @@ it('should keep the same buckets if .assign() is ran twice', () => {
   }
 })
 
-// https://github.com/dollarshaveclub/lua/issues/27
+// https://github.com/OkeyAmy/lua_package/issues/27
 it('should randomly assign when doing .assign()', () => {
   // Set up our test API
   const test = new Lua({ store: MemoryStore() })
