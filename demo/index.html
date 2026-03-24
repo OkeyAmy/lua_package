@@ -4,808 +4,957 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua E-commerce Demo - UTM Personalization</title>
+    <title>Lua Dynamic Website — AI Personalization</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --primary-color: #111;
-            --secondary-color: #666;
-            --accent-color: #000;
-            --bg-color: #fff;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Base Neutral Theme */
+            --bg-base: #f8fafc;
+            --text-base: #0f172a;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --font-head: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --transition-speed: 0.6s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: var(--font-family);
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--primary-color);
-            line-height: 1.5;
+            font-family: var(--font-body);
+            background-color: var(--bg-base);
+            color: var(--text-base);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
         }
 
-        /* Header */
-        header {
+        /* 
+         * =========================================
+         * THEME 1: DEFAULT / DISCOVER (Clean Grid)
+         * =========================================
+         */
+        body.intent-default {
+            --bg-base: #ffffff;
+            --surface: #f8fafc;
+            --text-base: #0f172a;
+            --accent: #2563eb;
+        }
+
+        .layout-container {
+            flex: 1;
+            padding: 2rem 4rem;
+            transition: all var(--transition-speed);
+            width: 100%;
+            display: grid;
+        }
+
+        .nav-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
         }
 
-        .logo {
+        .nav-bar h1 {
+            font-family: var(--font-head);
             font-weight: 700;
             font-size: 1.5rem;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
         }
 
-        nav a {
-            margin-left: 2rem;
-            text-decoration: none;
-            color: var(--secondary-color);
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        nav a:hover {
-            color: var(--primary-color);
-        }
-
-        /* Hero Section (Personalization Target) */
-        .hero {
-            height: 80vh;
-            min-height: 400px;
+        .dynamic-content {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            color: white;
-            transition: background-image 0.5s ease;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeIn 0.8s ease forwards;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.35);
+        .content-block {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            padding: 2rem;
+        .content-block.active {
+            display: block;
+            opacity: 1;
+            animation: slideUp 0.6s ease forwards;
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            font-weight: 800;
-            line-height: 1.1;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                filter: blur(10px);
+            }
+
+            to {
+                opacity: 1;
+                filter: blur(0);
+            }
         }
 
-        .btn {
-            display: inline-block;
-            padding: 1rem 2.5rem;
-            background-color: white;
-            color: black;
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 4px;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Product Grid (Static) */
-        .products {
-            padding: 4rem 2rem;
+        /* Default Layout */
+        .grid-layout {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 2rem;
         }
 
-        .product-card {
-            border: 1px solid #eee;
-            border-radius: 8px;
-            overflow: hidden;
+        .grid-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s;
         }
 
-        .product-img {
-            height: 300px;
-            background-color: #f5f5f5;
+        .grid-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .grid-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .grid-card h3 {
+            font-family: var(--font-head);
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        /* 
+         * =========================================
+         * THEME 2: BUY NOW (Focused Checkout)
+         * =========================================
+         */
+        body.intent-buy_now {
+            --bg-base: #fafafa;
+            --surface: #ffffff;
+            --accent: #ef4444;
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 4rem;
+            align-items: start;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .checkout-image {
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-panel {
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 2rem;
+            border: 2px solid rgba(239, 68, 68, 0.1);
+        }
+
+        .checkout-price {
+            font-size: 3rem;
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: var(--text-base);
+            margin: 1rem 0;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--accent);
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s;
+        }
+
+        .checkout-btn:hover {
+            background: #dc2626;
+            transform: scale(1.02);
+        }
+
+        .urgency-banner {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #aaa;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            animation: pulseRed 2s infinite;
         }
 
-        .product-info {
-            padding: 1rem;
+        @keyframes pulseRed {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
         }
 
-        .product-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+        /* 
+         * =========================================
+         * THEME 3: COMPARE (Split Screen)
+         * =========================================
+         */
+        body.intent-compare {
+            --bg-base: #f1f5f9;
+            --surface: #ffffff;
+            --accent: #8b5cf6;
         }
 
-        .product-price {
-            color: #666;
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
         }
 
-        /* Debug Panel */
-        .debug-panel {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: white;
-            padding: 1.25rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            font-size: 0.8rem;
-            max-width: 340px;
-            max-height: 80vh;
-            overflow-y: auto;
+        .split-side {
+            background: var(--surface);
+            padding: 4rem 3rem;
+            text-align: center;
         }
 
-        .debug-panel strong {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+        .split-side:hover {
+            background: #fafafa;
         }
 
-        .debug-panel .debug-row {
+        .split-side img {
+            width: 80%;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .split-side h2 {
+            font-family: var(--font-head);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .spec-list {
+            list-style: none;
+            text-align: left;
+            margin: 2rem 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .spec-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            padding: 0.25rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95rem;
         }
 
-        .debug-panel .debug-label {
-            color: #888;
-            font-size: 0.75rem;
+        .spec-list li strong {
+            color: var(--accent);
         }
 
-        .debug-panel .debug-value {
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: #333;
-            text-align: right;
-            max-width: 180px;
-            word-break: break-all;
+        /* 
+         * =========================================
+         * THEME 4: GAMING / USE_CASE (Immersive)
+         * =========================================
+         */
+        body.intent-use_case {
+            --bg-base: #030712;
+            --text-base: #f9fafb;
+            --text-muted: #9ca3af;
+            --surface: rgba(17, 24, 39, 0.7);
+            --border: rgba(55, 65, 81, 0.5);
+            --accent: #10b981;
         }
 
-        .debug-panel .debug-value.utm-source {
-            color: #2563eb;
+        body.intent-use_case .nav-bar {
+            border-bottom-color: var(--border);
         }
 
-        .debug-panel .debug-value.referrer-source {
-            color: #059669;
+        .immersive-layout {
+            position: relative;
+            padding: 6rem 0;
+            text-align: center;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(16, 185, 129, 0.1);
         }
 
-        .debug-panel .debug-value.random-source {
-            color: #d97706;
+        .immersive-layout::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.2), transparent 70%);
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .debug-panel button {
-            background: #eee;
-            border: none;
-            padding: 0.5rem 1rem;
+        .immersive-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .immersive-content h1 {
+            font-size: 5rem;
+            font-family: var(--font-head);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 4rem 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        /* 
+         * =========================================
+         * ENGINE DASHBOARD (Detailed Logging)
+         * =========================================
+         */
+        .dashboard-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .dashboard-toggle {
+            pointer-events: auto;
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            font-family: var(--font-head);
+            font-size: 0.875rem;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-toggle:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .engine-panel {
+            pointer-events: auto;
+            width: 450px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: #f8fafc;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            transition: all 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .engine-panel.open {
+            max-height: 90vh;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .panel-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header .badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 2px 8px;
             border-radius: 4px;
-            font-size: 0.8rem;
-            width: 100%;
-        }
-
-        .debug-panel button:hover {
-            background: #ddd;
-        }
-
-        .debug-panel .utm-links {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #eee;
-        }
-
-        .debug-panel .utm-links strong {
-            font-size: 0.8rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .debug-panel .utm-links a {
-            display: block;
             font-size: 0.7rem;
-            color: #2563eb;
-            text-decoration: none;
-            padding: 0.2rem 0;
-            word-break: break-all;
+            font-family: monospace;
         }
 
-        .debug-panel .utm-links a:hover {
-            text-decoration: underline;
+        .panel-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 1rem;
-                padding: 1rem;
-            }
+        .section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
 
-            nav a {
-                margin-left: 1rem;
-            }
+        .section-title:first-child {
+            margin-top: 0;
+        }
 
-            .hero h1 {
-                font-size: 2.5rem;
-            }
+        /* Organic Input Form */
+        .organic-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
 
-            .hero p {
-                font-size: 1.1rem;
-            }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
 
-            .btn {
-                padding: 0.75rem 1.5rem;
-            }
+        .input-group label {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
 
-            .products {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                padding: 2rem 1rem;
-                gap: 1rem;
-            }
+        .organic-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            width: 100%;
+            transition: border 0.3s;
+        }
 
-            .product-img {
-                height: 180px;
-            }
+        .organic-input:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
 
-            .debug-panel {
-                bottom: 0.5rem;
-                right: 0.5rem;
-                left: 0.5rem;
-                max-width: none;
-            }
+        .run-algo-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: 700;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-family: var(--font-head);
+            transition: transform 0.2s;
+        }
+
+        .run-algo-btn:hover {
+            transform: scale(1.02);
+            background: #7dd3fc;
+        }
+
+        /* Console Log Terminal */
+        .terminal-box {
+            background: #020617;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid #1e293b;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            height: 200px;
+            overflow-y: auto;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-line {
+            margin-bottom: 2px;
+            padding-bottom: 2px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+        .term-time {
+            color: #475569;
+            margin-right: 6px;
+        }
+
+        .term-module {
+            color: #f472b6;
+            font-weight: bold;
+        }
+
+        .term-success {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .term-val {
+            color: #38bdf8;
+        }
+
+        .term-warn {
+            color: #f59e0b;
+        }
+
+        /* Final Result Card */
+        .result-card {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #38bdf8;
+            text-transform: uppercase;
+        }
+
+        .conf-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .conf-bar-fill {
+            height: 100%;
+            background: #38bdf8;
+            transition: width 0.5s;
         }
     </style>
 </head>
 
-<body>
+<body class="intent-default">
 
-    <header>
-        <div class="logo">LUXE.</div>
-        <nav>
-            <a href="#">Shop</a>
-            <a href="#">Collections</a>
-            <a href="#">About</a>
-            <a href="#">Cart (0)</a>
+    <!-- The actual website UI that morphs -->
+    <div class="layout-container" id="main-layout">
+
+        <nav class="nav-bar">
+            <h1>Aura.</h1>
+            <div style="font-weight: 500; font-size: 0.9rem; color: var(--text-muted)">Architectural Morphing Demo</div>
         </nav>
-    </header>
 
-    <!--
-        Hero Section: Uses data-personalize attributes for content injection
-        The UTM personalization engine scans for these attributes and
-        injects content based on UTM params, referrer, or random A/B fallback
-    -->
-    <div class="hero" data-personalize="hero">
-        <div class="hero-content">
-            <h1 data-personalize="headline">Welcome to Our Store</h1>
-            <p data-personalize="subheadline">Discover products you'll love.</p>
-            <a href="/shop" data-personalize="ctaLink" class="btn">
-                <span data-personalize="ctaLabel">Start Shopping</span>
-            </a>
-        </div>
+        <main class="dynamic-content">
+
+            <!-- LAYOUT 1: DEFAULT -->
+            <div id="layout-default" class="content-block active">
+                <div style="text-align: center; margin-bottom: 4rem;">
+                    <h2 style="font-family: var(--font-head); font-size: 3rem; margin-bottom: 1rem;">Discover
+                        Perfection.</h2>
+                    <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">Browse our
+                        curated collection of premium tech items. Crafted for exactly what you need.</p>
+                </div>
+                <div class="grid-layout">
+                    <div class="grid-card">
+                        <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80" alt="Laptop">
+                        <h3>AuraBook Pro</h3>
+                        <p style="color: var(--text-muted)">Starting at $1,299</p>
+                    </div>
+                    <div class="grid-card">
+                        <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80"
+                            alt="Monitor">
+                        <h3>AuraVision Display</h3>
+                        <p style="color: var(--text-muted)">Starting at $899</p>
+                    </div>
+                    <div class="grid-card">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"
+                            alt="Headphones">
+                        <h3>AuraSound ANC</h3>
+                        <p style="color: var(--text-muted)">Starting at $299</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYOUT 2: BUY NOW -->
+            <div id="layout-buy_now" class="content-block">
+                <div class="checkout-layout">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1000&q=80"
+                            alt="Product" class="checkout-image">
+                    </div>
+                    <div class="checkout-panel">
+                        <div class="urgency-banner">⏱️ High Demand: Only 3 items left!</div>
+                        <h2 style="font-family: var(--font-head); font-size: 2.5rem;">AuraChron Watch</h2>
+                        <p style="color: var(--text-muted); margin-top: 1rem; line-height: 1.6;">Skip the browsing and
+                            secure your AuraChron today with free expedited shipping.</p>
+                        <div class="checkout-price">$499.00</div>
+                        <button class="checkout-btn">Complete Purchase Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYOUT 3: COMPARE -->
+            <div id="layout-compare" class="content-block">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h2 style="font-family: var(--font-head); font-size: 3rem; margin-bottom: 1rem;">Make the Right
+                        Choice.</h2>
+                </div>
+                <div class="split-layout">
+                    <div class="split-side">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"
+                            alt="Model A">
+                        <h2>AuraSound Pro</h2>
+                        <ul class="spec-list">
+                            <li><span>Battery</span> <strong>24 Hours</strong></li>
+                            <li><span>Noise Cancellation</span> <strong>Active</strong></li>
+                        </ul>
+                    </div>
+                    <div class="split-side">
+                        <img src="https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80"
+                            alt="Model B">
+                        <h2>AuraSound Max</h2>
+                        <ul class="spec-list">
+                            <li><span>Battery</span> <strong>48 Hours</strong></li>
+                            <li><span>Noise Cancellation</span> <strong>Adaptive (AI)</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYOUT 4: GAMING -->
+            <div id="layout-use_case" class="content-block">
+                <div class="immersive-layout">
+                    <div class="immersive-content">
+                        <h1>Absolute<br>Domination</h1>
+                        <p style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 3rem;">Hardware engineered
+                            for zero latency and infinite precision.</p>
+                        <button
+                            style="background:var(--accent); color:#000; padding:1.5rem 4rem; border:none; border-radius:8px; font-family:var(--font-head); font-size:1.5rem; font-weight:700; text-transform:uppercase;">
+                            Build Your Setup
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <section class="products">
-        <div class="product-card">
-            <div class="product-img">Product Bundle 1</div>
-            <div class="product-info">
-                <div class="product-title">Classic Tee</div>
-                <div class="product-price">$29.00</div>
-            </div>
-        </div>
-        <div class="product-card">
-            <div class="product-img">Product Bundle 2</div>
-            <div class="product-info">
-                <div class="product-title">Denim Jacket</div>
-                <div class="product-price">$89.00</div>
-            </div>
-        </div>
-        <div class="product-card">
-            <div class="product-img">Product Bundle 3</div>
-            <div class="product-info">
-                <div class="product-title">Leather Boots</div>
-                <div class="product-price">$149.00</div>
-            </div>
-        </div>
-        <div class="product-card">
-            <div class="product-img">Product Bundle 4</div>
-            <div class="product-info">
-                <div class="product-title">Wool Scarf</div>
-                <div class="product-price">$39.00</div>
-            </div>
-        </div>
-    </section>
+    <!-- Enhanced Detailed Dashboard -->
+    <div class="dashboard-container">
 
-    <!-- Debug Panel: Shows personalization context and allows testing UTM URLs -->
-    <div class="debug-panel" id="debug-panel">
-        <strong>Lua Personalization Debug</strong>
-        <div id="debug-info">Loading...</div>
+        <button class="dashboard-toggle" id="toggle-btn" onclick="toggleDashboard()">
+            <div class="status-dot"></div>
+            LuaIntent Diagnostics
+            <span id="toggle-icon">▼</span>
+        </button>
 
-        <!-- AI Configuration Toggle -->
-        <div id="ai-config-section" style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #eee;">
-            <strong style="font-size:0.8rem;">AI Personalization</strong>
-            <div style="margin-top:0.4rem;">
-                <label style="font-size:0.7rem;display:flex;align-items:center;gap:0.3rem;cursor:pointer;">
-                    <input type="checkbox" id="ai-toggle"> Enable AI Mode
-                </label>
+        <aside class="engine-panel" id="engine-panel">
+            <div class="panel-header">
+                <h3>🧠 Algorithmic Pipeline</h3>
+                <span class="badge">v1.0.0 CORE</span>
             </div>
-            <div id="ai-fields" style="display:none;margin-top:0.4rem;">
-                <input type="text" id="ai-api-key" placeholder="OpenAI API Key (sk-...)"
-                    style="width:100%;padding:0.3rem;font-size:0.7rem;margin-bottom:0.3rem;border:1px solid #ddd;border-radius:3px;box-sizing:border-box;">
-                <select id="ai-model" style="width:100%;padding:0.3rem;font-size:0.7rem;margin-bottom:0.3rem;border:1px solid #ddd;border-radius:3px;">
-                    <option value="gpt-4o-mini" selected>gpt-4o-mini (default)</option>
-                    <option value="gpt-4o">gpt-4o</option>
-                    <option value="gpt-4-turbo">gpt-4-turbo</option>
-                    <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                </select>
-                <select id="ai-mode" style="width:100%;padding:0.3rem;font-size:0.7rem;margin-bottom:0.3rem;border:1px solid #ddd;border-radius:3px;">
-                    <option value="select" selected>Select Mode (pick best variant)</option>
-                    <option value="generate">Generate Mode (AI writes content)</option>
-                </select>
-                <button type="button" onclick="runAIPersonalization()" style="width:100%;padding:0.4rem;font-size:0.75rem;background:#2563eb;color:white;border:none;border-radius:3px;cursor:pointer;margin-bottom:0.3rem;">
-                    Run AI Personalization
-                </button>
-                <div id="ai-status" style="font-size:0.65rem;color:#666;"></div>
-            </div>
-        </div>
 
-        <div class="utm-links">
-            <strong>Test UTM Links:</strong>
-            <a href="/demo?utm_source=google&utm_medium=cpc&utm_campaign=summer_sale">Google Ads - Sale Campaign</a>
-            <a href="/demo?utm_source=facebook&utm_medium=social&utm_campaign=gaming_promo">Facebook - Gaming</a>
-            <a href="/demo?utm_source=twitter&utm_medium=social&utm_campaign=brand_story">Twitter - Brand Story</a>
-            <a href="/demo?utm_source=email&utm_medium=newsletter&utm_campaign=welcome_back">Email - Returning User</a>
-            <a href="/demo?utm_source=youtube&utm_medium=video&utm_campaign=creative_tools">YouTube - Creative</a>
-            <a href="/demo?utm_source=instagram&utm_medium=social">Instagram - Social</a>
-            <a href="/demo?utm_source=linkedin&utm_medium=professional&utm_campaign=office_gear">LinkedIn - Professional</a>
-            <a href="/demo">No UTM (Random A/B)</a>
-        </div>
-        <button onclick="resetAndReload()">Reset & Reload (No UTM)</button>
-        <button onclick="clearAIHistory()" style="margin-top:0.25rem;">Clear AI History & Cache</button>
+            <div class="panel-body">
+
+                <!-- Organic Input testing -->
+                <div class="section-title">1. Provide Organic Signals</div>
+                <div class="organic-inputs">
+                    <div class="input-group">
+                        <label>Simulated URL / Search Query</label>
+                        <input type="text" id="mock-url" class="organic-input"
+                            placeholder="e.g. ?q=gaming+monitor+vs+office">
+                    </div>
+                    <div class="input-group">
+                        <label>Simulated Referrer Domain</label>
+                        <input type="text" id="mock-ref" class="organic-input" placeholder="e.g. https://reddit.com">
+                    </div>
+                    <button class="run-algo-btn" onclick="triggerOrganicRun()">Run Algorithm Pipeline</button>
+                    <div style="font-size: 0.7rem; color: #64748b; text-align: center; margin-top: 4px;">(Or just scroll
+                        the page to update tracking behavior)</div>
+                </div>
+
+                <div class="section-title">2. Live Streaming Matrix Logs</div>
+                <div class="terminal-box" id="engine-logs">
+                    <div class="terminal-line"><span class="term-time">[System]</span> Engine standing by...</div>
+                </div>
+
+                <div class="section-title">3. Final Decision Output</div>
+                <div class="result-card">
+                    <div class="result-row">
+                        <div class="result-label">DOMINANT INTENT</div>
+                        <div class="result-value" id="out-intent">AWAITING</div>
+                    </div>
+                    <div class="result-row">
+                        <div class="result-label">CONFIDENCE (SEPARATION)</div>
+                        <div class="result-value" style="font-size: 1rem;" id="out-conf">0%</div>
+                    </div>
+                    <div class="conf-bar-bg">
+                        <div class="conf-bar-fill" id="out-conf-bar" style="width:0%"></div>
+                    </div>
+
+                    <div
+                        style="margin-top: 0.75rem; font-size: 0.8rem; color: #94a3b8; line-height: 1.4; border-top: 1px dashed rgba(56,189,248,0.3); padding-top: 0.5rem;">
+                        <span style="color: #38bdf8;">Reason:</span> <span id="out-reason">-</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 1rem;">
+                    <button onclick="setPresets('?utm_campaign=checkout&intent=buy_now', '')"
+                        style="flex:1; background:rgba(255,255,255,0.05); color:white; border:none; padding:4px; border-radius:4px; cursor:pointer; font-size:0.7rem;">Preset:
+                        Buyer</button>
+                    <button onclick="setPresets('?q=144hz+monitor+vs+240hz', 'https://reddit.com')"
+                        style="flex:1; background:rgba(255,255,255,0.05); color:white; border:none; padding:4px; border-radius:4px; cursor:pointer; font-size:0.7rem;">Preset:
+                        Reddit</button>
+                    <button onclick="setPresets('?persona=gaming', 'https://twitch.tv')"
+                        style="flex:1; background:rgba(255,255,255,0.05); color:white; border:none; padding:4px; border-radius:4px; cursor:pointer; font-size:0.7rem;">Preset:
+                        Twitch</button>
+                </div>
+            </div>
+        </aside>
+
     </div>
 
-    <!--
-        Load the standalone UTM Personalization script
-        Uses defer to avoid blocking page load (recommended approach)
-        This single script handles: UTM extraction, intent inference,
-        DOMPurify sanitization, and data-personalize attribute injection
-    -->
-    <script src="../src/utm-personalize.js" defer></script>
-
-    <!-- AI Personalization Modules (optional - load for AI features) -->
-    <script src="../src/storage/weighted-history.js" defer></script>
-    <script src="../src/prompts/personalization-prompts.js" defer></script>
-    <script src="../src/ai-personalize.js" defer></script>
-
+    <script src="lua-intent.bundle.js"></script>
     <script>
-        // ===================================================================
-        // USER-PROVIDED TEMPLATES
-        // Users define their own templates with their own content/assets
-        // ===================================================================
-        var userTemplates = {
-            // Price-focused: Sales and promotions
-            'price-focused': {
-                image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Exclusive Deals Just For You',
-                subheadline: 'Save up to 50% on premium products. Limited time offer.',
-                ctaLabel: 'Shop Deals Now',
-                ctaLink: '/deals'
-            },
-            // Gaming enthusiasts
-            'gaming': {
-                image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Level Up Your Setup',
-                subheadline: 'Pro-grade gear for serious gamers. RGB everything.',
-                ctaLabel: 'Explore Gaming',
-                ctaLink: '/gaming'
-            },
-            // Professional/office users
-            'professional': {
-                image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Work Smarter, Not Harder',
-                subheadline: 'Premium productivity tools for professionals.',
-                ctaLabel: 'View Collection',
-                ctaLink: '/professional'
-            },
-            // Creative/design focused
-            'creative': {
-                image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Create Without Limits',
-                subheadline: 'Tools and gear designed for creatives and artists.',
-                ctaLabel: 'Get Inspired',
-                ctaLink: '/creative'
-            },
-            // Brand story/about
-            'brand-story': {
-                image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Crafted With Purpose',
-                subheadline: 'Ethically sourced. Sustainably made. Built to last.',
-                ctaLabel: 'Our Story',
-                ctaLink: '/about'
-            },
-            // Search engine visitors
-            'search-optimized': {
-                image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Find What You Need',
-                subheadline: 'Top-rated products trusted by thousands.',
-                ctaLabel: 'Browse All',
-                ctaLink: '/products'
-            },
-            // Social media visitors (visual focus)
-            'social-visual': {
-                image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80',
-                headline: "What's Trending Now",
-                subheadline: 'The styles everyone is talking about.',
-                ctaLabel: 'See Trending',
-                ctaLink: '/trending'
-            },
-            // Twitter/X visitors (brief messaging)
-            'social-brief': {
-                image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Discover. Shop. Enjoy.',
-                subheadline: 'Curated picks, delivered fast.',
-                ctaLabel: 'Quick Shop',
-                ctaLink: '/quick'
-            },
-            // Returning users from email
-            'returning-user': {
-                image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Welcome Back',
-                subheadline: 'We saved your favorites. Ready to continue?',
-                ctaLabel: 'Continue Shopping',
-                ctaLink: '/favorites'
-            },
-            // YouTube visitors
-            'video-engaged': {
-                image: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=80',
-                headline: 'As Seen On Video',
-                subheadline: 'The products our creators love to use.',
-                ctaLabel: 'Watch & Shop',
-                ctaLink: '/featured'
-            },
-            // Default fallback (used when no UTM/referrer match)
-            'default': {
-                image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80',
-                headline: 'Welcome to Our Store',
-                subheadline: 'Discover products you\'ll love.',
-                ctaLabel: 'Start Shopping',
-                ctaLink: '/shop'
+        let engine;
+        let behaviorAnalyzer;
+        let isDashboardOpen = true;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.LuaIntent) {
+                logTerminal('System', '<span style="color:#ef4444">ERROR: Cannot find lua-intent.bundle.js. Run esbuild!</span>');
+                return;
             }
-        };
 
-        // ===================================================================
-        // AI TOGGLE UI
-        // ===================================================================
-        var aiToggle = document.getElementById('ai-toggle');
-        var aiFields = document.getElementById('ai-fields');
-        var apiKeyInput = document.getElementById('ai-api-key');
-        
-        if (aiToggle && aiFields) {
-            aiToggle.addEventListener('change', function() {
-                aiFields.style.display = this.checked ? 'block' : 'none';
-            });
-        }
-        
-        // Auto-populate API key from localStorage or URL parameter
-        if (apiKeyInput) {
-            // Check URL parameter first
-            var urlParams = new URLSearchParams(window.location.search);
-            var urlApiKey = urlParams.get('apiKey');
-            
-            // Check localStorage
-            var storedApiKey = localStorage.getItem('lua_demo_api_key');
-            
-            // Use URL param, then localStorage, then empty
-            var apiKeyToUse = urlApiKey || storedApiKey || '';
-            
-            if (apiKeyToUse) {
-                apiKeyInput.value = apiKeyToUse;
-                // Auto-enable AI mode if key is present
-                if (aiToggle) {
-                    aiToggle.checked = true;
-                    if (aiFields) aiFields.style.display = 'block';
-                }
-                // Save to localStorage for next time
-                if (!urlApiKey && storedApiKey !== apiKeyToUse) {
-                    localStorage.setItem('lua_demo_api_key', apiKeyToUse);
-                }
-            }
-        }
+            engine = new window.LuaIntent({ debug: true });
+            behaviorAnalyzer = new window.BehaviorAnalyzer({ enableListeners: true });
 
-        // ===================================================================
-        // INITIALIZATION
-        // ===================================================================
+            setTimeout(() => {
+                document.getElementById('engine-panel').classList.add('open');
+                document.getElementById('toggle-icon').innerText = '▲';
+            }, 500);
 
-        // Wait for the personalization script to load and execute
-        document.addEventListener('DOMContentLoaded', function () {
-            // Wait for scripts to load (defer scripts load in order)
-            setTimeout(function() {
-                var api = window.LuaUTMPersonalize;
-                if (!api) {
-                    console.error('LuaUTMPersonalize not loaded');
-                    return;
-                }
+            // Set initial defaults
+            document.getElementById('mock-url').value = window.location.search || '?utm_source=organic';
+            document.getElementById('mock-ref').value = document.referrer || '';
 
-                // Check if AI should run (from "Run AI Personalization" button)
-                var shouldRunAI = false;
-                var aiConfig = null;
-                try {
-                    shouldRunAI = sessionStorage.getItem('lua-demo-run-ai') === 'true';
-                    var savedConfig = localStorage.getItem('lua-demo-ai-config');
-                    if (savedConfig) {
-                        aiConfig = JSON.parse(savedConfig);
-                    }
-                    // Clear the flag after reading
-                    sessionStorage.removeItem('lua-demo-run-ai');
-                } catch (e) {
-                    console.warn('Could not read storage:', e);
-                }
+            triggerOrganicRun();
 
-                // If AI should run, use AI personalization with generate mode
-                if (shouldRunAI && aiConfig && aiConfig.enabled && aiConfig.apiKey) {
-                    // Update UI to reflect AI mode
-                    var aiToggle = document.getElementById('ai-toggle');
-                    var aiApiKey = document.getElementById('ai-api-key');
-                    var aiModel = document.getElementById('ai-model');
-                    var aiMode = document.getElementById('ai-mode');
-                    var aiFields = document.getElementById('ai-fields');
-                    
-                    if (aiToggle) aiToggle.checked = true;
-                    if (aiApiKey) aiApiKey.value = aiConfig.apiKey;
-                    if (aiModel) aiModel.value = aiConfig.model || 'gpt-4o-mini';
-                    if (aiMode) aiMode.value = 'generate';
-                    if (aiFields) aiFields.style.display = 'block';
-
-                    // Run AI personalization in generate mode
-                    var statusEl = document.getElementById('ai-status');
-                    if (statusEl) statusEl.textContent = 'Running AI personalization...';
-
-                    var result = api.personalize({
-                        templates: userTemplates,
-                        enableAI: true,
-                        aiConfig: {
-                            apiKey: aiConfig.apiKey,
-                            model: aiConfig.model || 'gpt-4o-mini',
-                            mode: 'generate', // Force generate mode
-                            timeout: 8000,
-                            fallbackToStandard: true,
-                            cacheDecisions: true,
-                            historyEnabled: true,
-                            historyDecayRate: 0.9,
-                            maxHistorySize: 10,
-                            brandContext: {
-                                brandVoice: 'modern, clean, premium',
-                                targetAudience: 'online shoppers',
-                                productType: 'lifestyle and fashion products',
-                                industry: 'e-commerce'
-                            }
-                        },
-                        log: true
-                    });
-
-                    // Handle async AI result
-                    if (result && typeof result.then === 'function') {
-                        result.then(function(decision) {
-                            if (statusEl) {
-                                var info = 'AI generative content applied.';
-                                if (decision.aiResponse) {
-                                    info += ' Model: ' + (decision.aiResponse.model || 'N/A');
-                                    info += ' | Confidence: ' + (decision.aiResponse.confidence || 'N/A');
-                                    info += ' | Latency: ' + (decision.aiResponse.latency || '?') + 'ms';
-                                }
-                                if (decision.source === 'ai-cached') {
-                                    info = 'Using cached AI decision.';
-                                }
-                                statusEl.textContent = info;
-                                statusEl.style.color = '#059669';
-                            }
-                            updateDebugPanel(decision);
-                        }).catch(function(err) {
-                            if (statusEl) {
-                                statusEl.textContent = 'AI Error: ' + err.message;
-                                statusEl.style.color = '#dc2626';
-                            }
-                            console.error('[Demo] AI personalization error:', err);
-                            // Fallback to standard
-                            var fallback = api.personalize({
-                                templates: userTemplates,
-                                log: true
-                            });
-                            if (fallback && typeof fallback.then === 'function') {
-                                fallback.then(function(d) { updateDebugPanel(d); });
-                            } else {
-                                updateDebugPanel(fallback);
-                            }
-                        });
-                    } else {
-                        updateDebugPanel(result);
-                    }
-                } else {
-                    // Standard personalization (no AI by default)
-                    var decision = api.personalize({
-                        templates: userTemplates,
-                        log: true
-                    });
-
-                    // Handle both sync and async results
-                    if (decision && typeof decision.then === 'function') {
-                        decision.then(function(d) { updateDebugPanel(d); });
-                    } else {
-                        updateDebugPanel(decision);
-                    }
-                }
-
-                // Show returning user info if available
-                if (window.LuaWeightedHistory) {
-                    var isReturning = window.LuaWeightedHistory.isReturningUser();
-                    if (isReturning) {
-                        console.log('[Demo] Returning user detected. History:', window.LuaWeightedHistory.getHistory());
-                    }
-                }
-            }, 150);
+            // Periodically refresh behavior-only updates without spamming the log
+            setInterval(() => { if (engine) runSilentUpdate(); }, 2000);
         });
 
-        // ===================================================================
-        // AI PERSONALIZATION (triggered by button click)
-        // ===================================================================
-
-        function runAIPersonalization() {
-            var statusEl = document.getElementById('ai-status');
-            var apiKeyEl = document.getElementById('ai-api-key');
-            var apiKey = apiKeyEl ? apiKeyEl.value.trim() : '';
-            var modelEl = document.getElementById('ai-model');
-            var model = modelEl ? modelEl.value : 'gpt-4o-mini';
-            var modeEl = document.getElementById('ai-mode');
-            var mode = modeEl ? modeEl.value : 'generate';
-
-            if (!apiKey) {
-                if (statusEl) statusEl.textContent = 'Please enter your OpenAI API key.';
-                return;
-            }
-
-            // Save AI config to localStorage for page reload
-            try {
-                localStorage.setItem('lua-demo-ai-config', JSON.stringify({
-                    apiKey: apiKey,
-                    model: model,
-                    mode: 'generate',
-                    enabled: true
-                }));
-            } catch (e) {
-                console.warn('Could not save to localStorage:', e);
-            }
-
-            // Set flag to trigger AI on page load
-            try {
-                sessionStorage.setItem('lua-demo-run-ai', 'true');
-            } catch (e) {
-                console.warn('Could not save to sessionStorage:', e);
-            }
-
-            // Show feedback then force page refresh so AI runs on load
-            if (statusEl) statusEl.textContent = 'Refreshing to run AI...';
-            setTimeout(function() {
-                window.location.reload();
-            }, 100);
+        function toggleDashboard() {
+            const panel = document.getElementById('engine-panel');
+            const icon = document.getElementById('toggle-icon');
+            isDashboardOpen = !isDashboardOpen;
+            if (isDashboardOpen) { panel.classList.add('open'); icon.innerText = '▲'; }
+            else { panel.classList.remove('open'); icon.innerText = '▼'; }
         }
 
-        // ===================================================================
-        // DEBUG PANEL
-        // ===================================================================
-
-        function updateDebugPanel(decision) {
-            var debugInfo = document.getElementById('debug-info');
-            if (!debugInfo) return;
-
-            var api = window.LuaUTMPersonalize;
-            if (!api) {
-                debugInfo.innerHTML = '<div class="debug-row"><span class="debug-label">Status</span><span class="debug-value">Script not loaded</span></div>';
-                return;
-            }
-
-            var context = api.getContext();
-
-            if (!decision) {
-                decision = api.engine.standardDecide(context, { templates: userTemplates });
-            }
-
-            var html = '';
-
-            // Source styling
-            var sourceClass = 'debug-value';
-            if (decision.source === 'utm') sourceClass += ' utm-source';
-            else if (decision.source === 'referrer') sourceClass += ' referrer-source';
-            else if (decision.source === 'random-ab') sourceClass += ' random-source';
-            else if (decision.source === 'ai' || decision.source === 'ai-cached') sourceClass += ' utm-source';
-
-            html += row('Decision Source', decision.source, sourceClass);
-            html += row('Intent', decision.intent);
-            html += row('Has UTM', context.hasUTM ? 'Yes' : 'No');
-
-            // UTM params
-            if (context.hasUTM) {
-                for (var key in context.utm) {
-                    html += row(key, context.utm[key]);
-                }
-            }
-
-            html += row('Referrer', context.referrer.source + ' (' + context.referrer.category + ')');
-            html += row('Device', context.userAgent.isMobile ? 'Mobile' : (context.userAgent.isTablet ? 'Tablet' : 'Desktop'));
-
-            // Template info
-            if (decision.template) {
-                html += row('Headline', decision.template.headline || 'N/A');
-            } else {
-                html += row('Template', 'None (check console for errors)');
-            }
-
-            // AI-specific info
-            if (decision.aiResponse) {
-                html += row('AI Model', decision.aiResponse.model || 'N/A');
-                html += row('AI Mode', decision.aiResponse.mode || 'N/A');
-                html += row('Confidence', decision.aiResponse.confidence || 'N/A');
-                html += row('Latency', (decision.aiResponse.latency || '?') + 'ms');
-                if (decision.aiResponse.reasoning) {
-                    html += row('Reasoning', decision.aiResponse.reasoning);
-                }
-            }
-
-            // History info
-            if (window.LuaWeightedHistory) {
-                var historyModule = window.LuaWeightedHistory;
-                html += row('Returning User', historyModule.isReturningUser() ? 'Yes' : 'No');
-                var history = historyModule.getHistory();
-                html += row('Visit Count', history.visits ? history.visits.length : 0);
-            }
-
-            debugInfo.innerHTML = html;
+        function setPresets(url, ref) {
+            document.getElementById('mock-url').value = url;
+            document.getElementById('mock-ref').value = ref;
+            triggerOrganicRun();
         }
 
-        function row(label, value, valueClass) {
-            valueClass = valueClass || 'debug-value';
-            return '<div class="debug-row"><span class="debug-label">' + label + '</span><span class="' + valueClass + '">' + (value || '') + '</span></div>';
+        function logTerminal(module, msg) {
+            const box = document.getElementById('engine-logs');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `<span class="term-time">[${time}]</span> <span class="term-module">${module}</span>: ${msg}`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
         }
 
-        function resetAndReload() {
-            window.location.href = '/demo';
+        function triggerOrganicRun() {
+            const box = document.getElementById('engine-logs');
+            box.innerHTML = ''; // clear logs
+
+            const rawUrl = document.getElementById('mock-url').value;
+            const rawRef = document.getElementById('mock-ref').value;
+
+            // Format URL for the engine context parsing
+            const contextUrl = window.location.origin + window.location.pathname + (rawUrl.startsWith('?') ? rawUrl : '?' + rawUrl);
+            const contextRef = rawRef;
+
+            logTerminal('Core', `Pipeline initiated. Collecting raw signals...`);
+            logTerminal('Listener', `URL Query: <span class="term-val">${rawUrl || 'None'}</span>`);
+            logTerminal('Listener', `Referrer Doc: <span class="term-val">${rawRef || 'None'}</span>`);
+
+            // Re-mount behavior if simulated visit is entirely new
+            const behaviorShot = behaviorAnalyzer.snapshot();
+            logTerminal('behaviorAnalyzer', `Current engagement: <span class="term-val">${behaviorShot.engagementScore.toFixed(2)}</span>`);
+
+            // Artificial delay to simulate step-by-step math for the user to read
+            setTimeout(() => executeEngineAlgorithm(contextUrl, contextRef, behaviorShot), 400);
         }
 
-        function clearAIHistory() {
-            if (window.LuaWeightedHistory) {
-                window.LuaWeightedHistory.clearHistory();
-            }
-            if (window.LuaAIPersonalize) {
-                window.LuaAIPersonalize.clearCache();
-            }
-            alert('History and AI cache cleared.');
-            window.location.reload();
+        function executeEngineAlgorithm(url, ref, behavior) {
+            const context = { url, referrer: ref, behavior };
+            const decision = engine.decide(context); // Actual algorithm runs here
+
+            // Extract the math to log it
+            const top = decision.scores.topIntent;
+            const sec = decision.scores.secondIntent;
+            const separation = (decision.scores.separation * 100).toFixed(1);
+
+            logTerminal('urlAnalyzer', `Applied keyword weights. Extracting UTMs...`);
+            logTerminal('scoreFuser', `Running Bayesian α-fusion across 6 layers.`);
+            logTerminal('confidenceCalc', `Top = <span class="term-success">${top}</span>, Runner-up = ${sec}. Separation = ${separation}%`);
+            logTerminal('priorityWaterfall', `Enforcing <b>P${decision.priority}</b> override rules.`);
+            logTerminal('Core', `Final Intent decided: <span class="term-success">${decision.intent.toUpperCase()}</span>`);
+
+            applyVisuals(decision);
+        }
+
+        function runSilentUpdate() {
+            // Used for the ticker tracker - doesn't log to terminal
+            const rawUrl = document.getElementById('mock-url').value;
+            const rawRef = document.getElementById('mock-ref').value;
+            const contextUrl = window.location.origin + window.location.pathname + (rawUrl.startsWith('?') ? rawUrl : '?' + rawUrl);
+            const decision = engine.decide({ url: contextUrl, referrer: rawRef, behavior: behaviorAnalyzer.snapshot() });
+            applyVisuals(decision);
+        }
+
+        function applyVisuals(decision) {
+            // 1. Map internal intent to 4 UI layouts
+            let layout = 'default';
+            if (['buy_now', 'budget'].includes(decision.intent)) layout = 'buy_now';
+            else if (['compare', 'research'].includes(decision.intent)) layout = 'compare';
+            else if (['use_case', 'brand', 'impulse'].includes(decision.intent)) layout = 'use_case';
+
+            document.body.className = `intent-${layout}`;
+
+            // Hide all, show active
+            document.querySelectorAll('.content-block').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById(`layout-${layout}`);
+            if (target) target.classList.add('active');
+
+            // Update Card
+            document.getElementById('out-intent').textContent = decision.intent;
+            document.getElementById('out-reason').innerHTML = decision.reason;
+
+            const confPct = Math.round(decision.confidence * 100);
+            document.getElementById('out-conf').textContent = confPct + '% (Priority P' + decision.priority + ')';
+            document.getElementById('out-conf-bar').style.width = confPct + '%';
         }
     </script>
 </body>
